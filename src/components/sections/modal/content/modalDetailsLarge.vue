@@ -179,7 +179,7 @@ const dataInput = (event) => {
   caractersInput.value = event.target.value
 
   let result = JSON.parse(localStorage.getItem('taskList')) || []
-  result[props.indexSelected].updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss')
+  result[props.indexSelected].updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss')  
   result[props.indexSelected].taskDetails.descr = caractersInput.value
   localStorage.setItem('taskList', JSON.stringify(result))
 
@@ -198,12 +198,6 @@ const updatesPeriodically = () => {
 onMounted(()=>{
   updatesPeriodically();
 })
-
-// onUnmounted(() => {
-//   if (intervalTime) {
-//     clearInterval(intervalTime);
-//   }
-// });
 
 </script>
 
