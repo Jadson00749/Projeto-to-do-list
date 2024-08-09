@@ -3,12 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "cypress": "cypress open"
   },
   "dependencies": {
+    "@headlessui/vue": "^1.7.19",
+    "@heroicons/vue": "^2.1.1",
+    "autoprefixer": "^10.4.17",
+    "axios": "^1.6.7",
     "core-js": "^3.8.3",
+    "cypress": "^13.13.0",
+    "dayjs": "^2.0.0-alpha.4",
+    "howler": "^2.2.4",
+    "pinia": "^2.1.7",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "tippy.js": "^6.3.7",
     "vue": "^3.2.13"
   },
   "devDependencies": {
@@ -22,6 +34,8 @@
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.0.3",
+    "unplugin-auto-import": "^0.17.6",
+    "unplugin-vue-components": "^0.27.0"
   }
 }

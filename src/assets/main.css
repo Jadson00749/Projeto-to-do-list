@@ -1,0 +1,15 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* .tippy-box {
+  @apply rounded-sm border border-red-500;
+} */
+
+/* .tippy-arrow {
+  @apply border border-red-500 ;
+} */
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#444444];
+}
