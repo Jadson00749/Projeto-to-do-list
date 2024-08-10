@@ -16,12 +16,16 @@
     "core-js": "^3.8.3",
     "cypress": "^13.13.0",
     "dayjs": "^2.0.0-alpha.4",
+    "dropzone": "^6.0.0-beta.2",
     "howler": "^2.2.4",
     "pinia": "^2.1.7",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
     "tippy.js": "^6.3.7",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-filepond": "^7.0.4",
+    "vue-upload-component": "^2.8.23",
+    "vue3-dropzone": "^2.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

@@ -72,16 +72,44 @@
               <p :class="remindmeHoverActive === 4 ? 'text-white' : 'text-white opacity-55'">Escolha uma categoria</p>
             </button>
           </div>
-          <div class="modal-group-four">
-            <button class="--btn" @mouseover="remindmeHoverActive = 5" @mouseout="remindmeHoverActive = 0">
-              <PaperClipIcon class="w-5 h-5 ml-4" :class="remindmeHoverActive === 5 ? 'text-white' : 'text-white opacity-55'" />
-              <p :class="remindmeHoverActive === 5 ? 'text-white' : 'text-white opacity-55'">Adicionar arquivo</p>
-            </button>
+
+          <div class="upload-container">
+
+            <a :href="fileURL" target="_blank" v-if="dataUpload !== null" class="modal-group-upload">
+              <div class="--selected">
+                  <span>{{ dataUpload[0].name.split('.')[1].toUpperCase() }}</span>
+              </div>
+              <div class="--info">
+                <div><span class="text-sm --name">{{ dataUpload[0]?.name }}</span></div>
+                <div class="flex">
+                  <span class="text-[12px] font-normal">{{ formatFileSize(dataUpload[0]?.size) }} - Arquivo</span>
+                </div>
+              </div>
+              <button>
+                <XMarkIcon class="--x-mark" />
+              </button>
+            </a>
+            <hr v-if="dataUpload !== null" class="opacity-15"/>
+            <div class="modal-group-upload">
+  
+                <button @click="uploadFilesActive" class="--btn" @mouseover="remindmeHoverActive = 5" @mouseout="remindmeHoverActive = 0">
+                  <PaperClipIcon class="w-5 h-5 ml-4" :class="remindmeHoverActive === 5 ? 'text-white' : 'text-white opacity-55'" />
+                  <p :class="remindmeHoverActive === 5 ? '!text-white' : '!text-white opacity-55'">Adicione arquivo</p>
+                  <input
+                    ref="fileInput"
+                    type="file"
+                    @change="uploadFiles"
+                    class="hidden"
+                  />
+                </button>
+  
+            </div>
           </div>
+
           <div class="text-area-button" :class="taskModel.taskDetails.descr === '' ? 'h-[76px]' : 'h-[92px]'">
             <div>
               <input placeholder="Adicionar anotação" @input="dataInput" v-model="taskModel.taskDetails.descr" />
-                <div v-if="taskModel.taskDetails.descr !== '' || caractersInput !== ''">
+                <div v-if="taskModel.taskDetails.descr !== ''">
                   <!-- <p>Atualizado há poucos segundos</p> -->
                   <p>{{ diffDay >= 30 ? 'Atualizado em' : 'Atualizado' }} {{ previosTime }}</p>
                 </div>
@@ -113,6 +141,7 @@ import {
   import dayjs from 'dayjs';
   import relativeTime from 'dayjs/plugin/relativeTime';
   import 'dayjs/locale/pt-br';
+  import {formatFileSize} from '@/commons/settingsData'
 
 const props = defineProps({
   isOpen:{
@@ -142,7 +171,13 @@ const savedDate = ref(dayjs(JSON.parse(localStorage.getItem('taskList'))[props.i
 const caractersInput = ref('')
 const forceUpdate = ref(false)
 const currentDate = ref(savedDate.value);
-// let intervalTime  = ref(null)
+const fileInput = ref(null)
+const fileName = ref('')
+const dataUpload = ref(null)
+const fileURL = ref('')
+const hover = ref(false);
+
+
 let diffDay = ref(0)
 const previosTime = computed(() => {
   if (!savedDate.value) return null;
@@ -195,6 +230,38 @@ const updatesPeriodically = () => {
   }, 60000)
 }
 
+const uploadFilesActive = () => {
+  if (fileInput.value) {
+    fileInput.value.click()
+  }
+}
+
+const uploadFiles = (event) => {
+  if(fileURL.value) URL.revokeObjectURL(fileURL.value);
+  dataUpload.value = event.target.files
+  
+  if (dataUpload.value.length > 0) {
+    fileName.value = dataUpload.value[0].name
+    console.log(event.target.files[0])
+    fileURL.value = URL.createObjectURL(event.target.files[0])
+    console.log(fileURL.value)
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      console.log(e.target.result); 
+
+      const blob = new Blob([e.target.result], { type: event.target.files[0].type })
+      const newUrl = URL.createObjectURL(blob)
+      console.log(newUrl)
+
+      // window.open(newUrl)
+    };
+
+    reader.readAsText(event.target.files[0]);
+  } else fileName.value = ''
+}
+
 onMounted(()=>{
   updatesPeriodically();
 })
@@ -202,6 +269,7 @@ onMounted(()=>{
 </script>
 
 <style scoped>
+
 .modal-details-container-section{
   @apply absolute w-[30%] h-full flex flex-col;
 }
@@ -257,10 +325,75 @@ onMounted(()=>{
 .modal-group-four p {
   @apply text-sm font-normal;
 }
+.modal-group-four input {
+  @apply text-sm font-normal w-full h-[22px] border-transparent focus:outline-none bg-transparent cursor-pointer;
+}
+
+.modal-group-four input::placeholder{
+  @apply text-white;
+}
+
+/*  */
+
+.upload-container {
+  @apply mt-2;
+}
+
+.upload-container .modal-group-upload {
+  @apply w-full h-[52px] flex gap-3 bg-[#272727] hover:bg-[#333333] rounded-[5px] transition-all duration-75;
+}
+
+.upload-container .modal-group-upload .--btn {
+  @apply w-full flex gap-4 items-center hover:bg-[#333333] transition-all duration-75;
+}
+
+.upload-container .modal-group-upload .--icon {
+  @apply w-5 h-5 ml-4 stroke-white fill-none;
+}
+
+.upload-container .modal-group-upload p {
+  @apply text-sm font-normal;
+}
+.upload-container .modal-group-upload input {
+  @apply text-sm font-normal w-full h-[22px] border-transparent focus:outline-none bg-transparent cursor-pointer;
+}
+
+.upload-container .modal-group-upload {
+  @apply flex items-center;
+}
+
+.upload-container .modal-group-upload .--selected {
+  @apply h-9 w-9 bg-blue-600 ml-3 rounded-[4px] flex justify-center items-center text-white text-[12px] font-semibold;
+}
+
+.modal-group-upload input::placeholder{
+  @apply text-white;
+}
+
+.modal-group-upload .--info {
+  @apply w-[80%] my-2;
+}
+
+.modal-group-upload .--info span{
+  @apply text-white font-normal opacity-45;
+}
+
+.modal-group-upload button {
+  @apply sticky right-[3%];
+}
+
+.modal-group-upload .--x-mark {
+  @apply w-[18px] h-[18px] text-white;
+}
+
+.modal-group-upload:hover .--info .--name {
+  @apply hover:border-b-[1px] hover:border-blue-300;
+}
 
 .text-area-button {
   @apply w-full p-4 mt-2 bg-[#272727] hover:border-[1px] hover:border-white hover:border-opacity-25 rounded-[5px];
 } 
+
 
 .text-area-button div {
   @apply w-full h-full flex flex-col justify-between;
