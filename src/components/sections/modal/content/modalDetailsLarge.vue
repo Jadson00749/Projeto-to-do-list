@@ -75,12 +75,12 @@
 
           <div class="upload-container">
 
-            <a :href="fileURL" target="_blank" v-if="dataUpload !== null" class="modal-group-upload">
+            <a :href="fileURL" target="_blank" v-if="dataUpload !== null" class="modal-group-upload" :class="displayUpload ? '' : 'upload-display-section'" @mouseout="displayUpload = true" @mouseover="displayUpload = false">
               <div class="--selected">
                   <span>{{ dataUpload[0].name.split('.')[1].toUpperCase() }}</span>
               </div>
               <div class="--info">
-                <div><span class="text-sm --name">{{ dataUpload[0]?.name }}</span></div>
+                <div><span class="text-sm">{{ dataUpload[0]?.name }}</span></div>
                 <div class="flex">
                   <span class="text-[12px] font-normal">{{ formatFileSize(dataUpload[0]?.size) }} - Arquivo</span>
                 </div>
@@ -175,7 +175,7 @@ const fileInput = ref(null)
 const fileName = ref('')
 const dataUpload = ref(null)
 const fileURL = ref('')
-const hover = ref(false);
+const displayUpload = ref(false);
 
 
 let diffDay = ref(0)
@@ -242,23 +242,7 @@ const uploadFiles = (event) => {
   
   if (dataUpload.value.length > 0) {
     fileName.value = dataUpload.value[0].name
-    console.log(event.target.files[0])
     fileURL.value = URL.createObjectURL(event.target.files[0])
-    console.log(fileURL.value)
-
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      console.log(e.target.result); 
-
-      const blob = new Blob([e.target.result], { type: event.target.files[0].type })
-      const newUrl = URL.createObjectURL(blob)
-      console.log(newUrl)
-
-      // window.open(newUrl)
-    };
-
-    reader.readAsText(event.target.files[0]);
   } else fileName.value = ''
 }
 
@@ -269,7 +253,6 @@ onMounted(()=>{
 </script>
 
 <style scoped>
-
 .modal-details-container-section{
   @apply absolute w-[30%] h-full flex flex-col;
 }
@@ -482,6 +465,10 @@ onMounted(()=>{
 .slide-enter-to, .slide-leave {
   transform: translateX(0);
   opacity: 1;
+}
+
+.upload-display-section .--info span {
+  @apply border-b-[1px] border-b-sky-300;
 }
 
 </style>
