@@ -1,3 +1,5 @@
+import { computed } from "vue";
+
 export function formatFileSize(sizeInBytes) {
   if (sizeInBytes < 1024) {
     return `${sizeInBytes}B`;
@@ -9,3 +11,12 @@ export function formatFileSize(sizeInBytes) {
     return `${(sizeInBytes / (1024 * 1024 * 1024)).toFixed(1)}GB`;
   }
 };
+
+export const dataStorage = {
+  getStorage(key) {
+    return JSON.parse(localStorage.getItem(key))
+  },
+  setStorage(key,data) {
+    localStorage.setItem(key,JSON.stringify(data))
+  }
+}

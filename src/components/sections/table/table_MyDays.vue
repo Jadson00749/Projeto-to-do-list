@@ -38,6 +38,7 @@ import { SunIcon, EllipsisHorizontalIcon, CalendarIcon, BellIcon, ArrowPathRound
 import { toDoListStore } from '@/stores/toDoList.js'
 import { onBeforeMount, onMounted, ref, computed } from 'vue';
 import dayjs from 'dayjs';
+import { dataStorage } from '@/commons/settingsData';
 
 const props = defineProps({
   isOpenModalLarge:{
@@ -64,7 +65,7 @@ const inputValueTask = (event) => {
 }
 
 const createTask = () => {
-  objLocalStorage.value = JSON.parse(localStorage.getItem('taskList'))
+  objLocalStorage.value = dataStorage.getStorage('taskList')
   let obj = {
     id: id.value += 1,
     nameTask: enableAddition.value,
@@ -75,16 +76,17 @@ const createTask = () => {
     selectedTask: false,
     updateTime: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
       taskDetails:{
-        descr: ""
+        descr: "",
+        files: []
       }
     }
     if(objLocalStorage.value != null) {
       listValues.value = objLocalStorage.value
       listValues.value.push(obj)
       listValues.value.sort((a,b) => b?.id - a?.id)
-      localStorage.setItem('taskList', JSON.stringify(listValues.value))
+      dataStorage.setStorage('taskList', listValues.value)
     }else {
-      localStorage.setItem('taskList', JSON.stringify([obj]))
+      dataStorage.setStorage('taskList', [obj])
     }
     enableAddition.value = ''
     emit('getList')
@@ -105,8 +107,8 @@ const rules = computed(()=>{
 })
 
 onBeforeMount(()=>{
-  objLocalStorage.value = JSON.parse(localStorage.getItem('taskList'))
-  taskCompleted.value = JSON.parse(localStorage.getItem('taskCompleted'))
+  objLocalStorage.value = dataStorage.getStorage('taskList')
+  taskCompleted.value = dataStorage.getStorage('taskCompleted')
   if(objLocalStorage.value){
     id.value = objLocalStorage.value[0]?.id
   }else if(taskCompleted.value) {

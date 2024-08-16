@@ -37,8 +37,8 @@
               </div>
             </div>
           </div>
-          <div class="modal-group-two flex justify-between" @mouseover="dayHoverActive = true" @mouseout="dayHoverActive = false">
-           <div class="gap-4 flex">
+          <div class="modal-group-two flex" @mouseenter="dayHoverActive = true" @mouseleave="dayHoverActive = false">
+           <div class="gap-4 flex min-w-[85%]">
              <div class="flex items-center ml-4">
              <SunIcon class="w-5 h-5 text-blue-400" />
             </div>
@@ -75,18 +75,18 @@
 
           <div class="upload-container">
 
-            <a :href="fileURL" target="_blank" v-if="dataUpload !== null" class="modal-group-upload" :class="displayUpload ? '' : 'upload-display-section'" @mouseout="displayUpload = true" @mouseover="displayUpload = false">
+            <a :href="fileURL" target="_blank" v-if="dataUpload !== null" class="modal-group-upload" :class="displayUpload ? '' : 'upload-display-section'" @mouseenter="displayUpload = false" @mouseleave="displayUpload = true">
               <div class="--selected">
                   <span>{{ dataUpload[0].name.split('.')[1].toUpperCase() }}</span>
               </div>
               <div class="--info">
-                <div><span class="text-sm">{{ dataUpload[0]?.name }}</span></div>
+                <div class="truncate text-white text-opacity-45"><span class="text-sm">{{ dataUpload[0]?.name }}</span></div>
                 <div class="flex">
                   <span class="text-[12px] font-normal">{{ formatFileSize(dataUpload[0]?.size) }} - Arquivo</span>
                 </div>
               </div>
               <button>
-                <XMarkIcon class="--x-mark" />
+                <XMarkIcon v-if="!displayUpload" class="--x-mark" />
               </button>
             </a>
             <hr v-if="dataUpload !== null" class="opacity-15"/>
@@ -137,11 +137,12 @@ import {
         TransitionRoot, 
         TransitionChild 
     } from '@headlessui/vue'
-  import {ref,computed, onMounted, watch} from 'vue'
+  import {ref,computed, onMounted, watch, readonly} from 'vue'
   import dayjs from 'dayjs';
   import relativeTime from 'dayjs/plugin/relativeTime';
   import 'dayjs/locale/pt-br';
-  import {formatFileSize} from '@/commons/settingsData'
+  import {formatFileSize } from '@/commons/settingsData'
+  import { dataStorage } from '@/commons/settingsData';
 
 const props = defineProps({
   isOpen:{
@@ -166,8 +167,8 @@ const hoverActive = ref(false)
 const placeHolderActive = ref(false)
 const dayHoverActive = ref(false)
 const remindmeHoverActive = ref(0)
-const taskModel = computed(()=> JSON.parse(localStorage.getItem('taskList'))[props.indexSelected])
-const savedDate = ref(dayjs(JSON.parse(localStorage.getItem('taskList'))[props.indexSelected].updateTime))
+const taskModel = computed(()=> dataStorage.getStorage('taskList')[props.indexSelected])
+const savedDate = ref(dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime))
 const caractersInput = ref('')
 const forceUpdate = ref(false)
 const currentDate = ref(savedDate.value);
@@ -204,8 +205,8 @@ const rules = computed(()=>{
 
 watch(()=>props.nameTaskSelected,()=>{
   console.log('entrei vou atualizar variavel')
-  savedDate.value = dayjs(JSON.parse(localStorage.getItem('taskList'))[props.indexSelected].updateTime)
-  taskModel.value = JSON.parse(localStorage.getItem('taskList'))[props.indexSelected]
+  savedDate.value = dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime)
+  taskModel.value = dataStorage.getStorage('taskList')[props.indexSelected]
 })
 
 const dataInput = (event) => {
@@ -213,13 +214,13 @@ const dataInput = (event) => {
   forceUpdate.value = !forceUpdate.value
   caractersInput.value = event.target.value
 
-  let result = JSON.parse(localStorage.getItem('taskList')) || []
+  let result = dataStorage.getStorage('taskList') || []
   result[props.indexSelected].updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss')  
   result[props.indexSelected].taskDetails.descr = caractersInput.value
-  localStorage.setItem('taskList', JSON.stringify(result))
+  dataStorage.setStorage('taskList', result)
 
-  savedDate.value = dayjs(JSON.parse(localStorage.getItem('taskList'))[props.indexSelected].updateTime)
-  taskModel.value = JSON.parse(localStorage.getItem('taskList'))[props.indexSelected]
+  savedDate.value = dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime)
+  taskModel.value = dataStorage.getStorage('taskList')[props.indexSelected]
 }
 
 const updatesPeriodically = () => {
@@ -243,11 +244,42 @@ const uploadFiles = (event) => {
   if (dataUpload.value.length > 0) {
     fileName.value = dataUpload.value[0].name
     fileURL.value = URL.createObjectURL(event.target.files[0])
+    saveUploads(dataUpload.value[0]);
+
+    
   } else fileName.value = ''
+}
+
+let arquive = ref(null)
+
+const saveUploads = (file) => {
+  let data = dataStorage.getStorage('taskList')
+
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  
+  reader.onload = () => {
+    let result = reader.result;
+    
+    data[props.indexSelected].taskDetails.files.push(result)
+    dataStorage.setStorage('taskList', data)
+  };
+}
+
+const retrivesAndCreateURL = () => {
+  let file = dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files[0]
+  if(file){
+    const base64 = file.split(',')[1]
+    console.log(base64)
+    const decodify = btoa(base64)
+    console.log(decodify)
+    
+  }
 }
 
 onMounted(()=>{
   updatesPeriodically();
+  retrivesAndCreateURL() // continuar aqui, já salva falta recuperar e transformar em blob novamente
 })
 
 </script>
@@ -266,7 +298,7 @@ onMounted(()=>{
 }
 
 .modal-group-two:nth-child(2) button {
-  @apply w-8 justify-center ml-20 ;
+  @apply w-8 justify-center ;
 }
 
 .modal-group-two .--p {
@@ -346,7 +378,7 @@ onMounted(()=>{
 }
 
 .upload-container .modal-group-upload .--selected {
-  @apply h-9 w-9 bg-blue-600 ml-3 rounded-[4px] flex justify-center items-center text-white text-[12px] font-semibold;
+  @apply min-h-9 min-w-9 bg-blue-600 ml-3 rounded-[4px] flex justify-center items-center text-white text-[12px] font-semibold;
 }
 
 .modal-group-upload input::placeholder{
@@ -354,7 +386,7 @@ onMounted(()=>{
 }
 
 .modal-group-upload .--info {
-  @apply w-[80%] my-2;
+  @apply w-[75%] my-2;
 }
 
 .modal-group-upload .--info span{

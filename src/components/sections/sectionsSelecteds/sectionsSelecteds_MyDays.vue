@@ -88,11 +88,12 @@ import tableMyDays from '@/components/sections/table/table_MyDays.vue'
 import modalConfirmDelete from '@/components/modal/modalConfirmDelete.vue'
 import { Howl } from 'howler';
 import tippy from "tippy.js";
+import { dataStorage } from '@/commons/settingsData';
 
 const storeToDoList = toDoListStore()
 const displayMyDays = () => ref(storeToDoList.getDisplayMyDays)
-const listTask = ref(JSON.parse(localStorage.getItem('taskList')))
-const listTaskCompleted = ref(JSON.parse(localStorage.getItem('taskCompleted')))
+const listTask = ref(dataStorage.getStorage('taskList'))
+const listTaskCompleted = ref(dataStorage.getStorage('taskCompleted'))
 const taskCreated = () => storeToDoList.getmyDaysCreated
 const loading = () => storeToDoList.getLoading
 const setLoading = (val) => storeToDoList.setLoading(val)
@@ -119,8 +120,8 @@ const IndexSelected = ref(null)
 const stateList = ref('');
 
 watch(()=>updateForce.value,()=>{
-  listTask.value = JSON.parse(localStorage.getItem('taskList'))
-  listTaskCompleted.value = JSON.parse(localStorage.getItem('taskCompleted'))
+  listTask.value = dataStorage.getStorage('taskList')
+  listTaskCompleted.value = dataStorage.getStorage('taskCompleted')
 })
 
 const notificationSounds = new Howl({
@@ -213,9 +214,9 @@ const tasksCompleted = (event,ent) => {
   notificationSounds.stop()
   listTask.value[event].completed = true
   listTaskCompleted.value.push(ent)
-  localStorage.setItem('taskCompleted', JSON.stringify(listTaskCompleted.value))
+  dataStorage.setStorage('taskCompleted', listTaskCompleted.value)
   result = listTask.value.filter(item => item?.id !== ent?.id)
-  localStorage.setItem('taskList', JSON.stringify(result))
+  dataStorage.setStorage('taskList', result)
   updateForce.value = !updateForce.value
   notificationSounds.seek(0.6)
   notificationSounds.play()
@@ -226,9 +227,9 @@ const markOfTask = (ent,event) => {
   let result = []
   listTaskCompleted.value[event].completed = false
   listTask.value.push(ent)
-  localStorage.setItem('taskList', JSON.stringify(listTask.value))
+  dataStorage.setStorage('taskList', listTask.value)
   result = listTaskCompleted.value.filter(item => item?.id !== ent?.id)
-  localStorage.setItem('taskCompleted', JSON.stringify(result))
+  dataStorage.setStorage('taskCompleted', result)
   updateForce.value = !updateForce.value
   // tasksCompletedValues.value.splice(event, 1)
   // listTask.value.push(ent)
@@ -271,10 +272,10 @@ const removeDay = () => {
   let result = []
   if(stateList.value === 'notCompleted'){
     result = listTask.value.filter(item => item?.id !== objSelected.value?.id)
-    localStorage.setItem('taskList', JSON.stringify(result))
+    dataStorage.setStorage('taskList', result)
   } else {
     result = listTaskCompleted.value.filter(item => item?.id !== objSelected.value?.id)
-    localStorage.setItem('taskCompleted', JSON.stringify(result))
+    dataStorage.setStorage('taskCompleted', result)
   }
   updateForce.value = !updateForce.value
   openModalOptionsSelected.value = !openModalOptionsSelected.value
@@ -285,16 +286,16 @@ const markCompleted = (event) => {
   if(event){
     listTask.value[IndexSelected.value].completed = true
     listTaskCompleted.value.push(objSelected.value)
-    localStorage.setItem('taskCompleted', JSON.stringify(listTaskCompleted.value))
+    dataStorage.setStorage('taskCompleted', listTaskCompleted.value)
     result = listTask.value.filter(item => item?.id !== objSelected.value?.id)
-    localStorage.setItem('taskList', JSON.stringify(result))
+    dataStorage.setStorage('taskList', result)
   } 
   else {
     listTaskCompleted.value[IndexSelected.value].completed = false
     listTask.value.push(objSelected.value)
-    localStorage.setItem('taskList', JSON.stringify(listTask.value))
+    dataStorage.setStorage('taskList', listTask.value)
     result = listTaskCompleted.value.filter(item => item?.id !== objSelected.value?.id)
-    localStorage.setItem('taskCompleted', JSON.stringify(result))
+    dataStorage.setStorage('taskCompleted', result)
   }
   updateForce.value = !updateForce.value
   openModalOptionsSelected.value = false
@@ -326,10 +327,10 @@ const deleteTask = () => {
   // setLoading(true)
   if(stateList.value === 'notCompleted'){
     let result = listTask.value.filter(item => item?.id !== objSelected.value?.id)
-    localStorage.setItem('taskList', JSON.stringify(result))
+    dataStorage.setStorage('taskList', result)
   } else {
     let result = listTaskCompleted.value.filter(item => item?.id !== objSelected.value?.id)
-    localStorage.setItem('taskCompleted', JSON.stringify(result))
+    dataStorage.setStorage('taskCompleted', result)
   }
   openDelete.value = !openDelete.value
   updateForce.value = !updateForce.value
