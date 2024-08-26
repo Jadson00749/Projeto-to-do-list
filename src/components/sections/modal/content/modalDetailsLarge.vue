@@ -75,14 +75,14 @@
 
           <div class="upload-container">
 
-            <a :href="fileURL" target="_blank" v-if="dataUpload !== null" class="modal-group-upload" :class="displayUpload ? '' : 'upload-display-section'" @mouseenter="displayUpload = false" @mouseleave="displayUpload = true">
+            <a v-for="ent in files" :key="ent?.id" :href="removeQuotes(ent?.content)" target="_blank" v-if="files.length" class="modal-group-upload" :class="displayUpload ? '' : 'upload-display-section'" @mouseenter="displayUpload = false" @mouseleave="displayUpload = true">
               <div class="--selected">
-                  <span>{{ dataUpload[0].name.split('.')[1].toUpperCase() }}</span>
+                  <span>{{ ent.name.split('.')[1].toUpperCase() }}</span>
               </div>
               <div class="--info">
-                <div class="truncate text-white text-opacity-45"><span class="text-sm">{{ dataUpload[0]?.name }}</span></div>
+                <div class="truncate text-white text-opacity-45"><span class="text-sm">{{ ent?.name }}</span></div>
                 <div class="flex">
-                  <span class="text-[12px] font-normal">{{ formatFileSize(dataUpload[0]?.size) }} - Arquivo</span>
+                  <span class="text-[12px] font-normal">{{ formatFileSize(ent?.size) }} - Arquivo</span>
                 </div>
               </div>
               <button>
@@ -169,6 +169,7 @@ const dayHoverActive = ref(false)
 const remindmeHoverActive = ref(0)
 const taskModel = computed(()=> dataStorage.getStorage('taskList')[props.indexSelected])
 const savedDate = ref(dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime))
+const files = ref(dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files || [])
 const caractersInput = ref('')
 const forceUpdate = ref(false)
 const currentDate = ref(savedDate.value);
@@ -177,6 +178,11 @@ const fileName = ref('')
 const dataUpload = ref(null)
 const fileURL = ref('')
 const displayUpload = ref(false);
+
+const removeQuotes = (base64) => {
+  let result = base64.replace(/^"|"$/g, '')
+  return result
+}
 
 
 let diffDay = ref(0)
@@ -240,46 +246,40 @@ const uploadFilesActive = () => {
 const uploadFiles = (event) => {
   if(fileURL.value) URL.revokeObjectURL(fileURL.value);
   dataUpload.value = event.target.files
-  
+
   if (dataUpload.value.length > 0) {
     fileName.value = dataUpload.value[0].name
     fileURL.value = URL.createObjectURL(event.target.files[0])
+    
     saveUploads(dataUpload.value[0]);
-
     
   } else fileName.value = ''
 }
 
-let arquive = ref(null)
-
 const saveUploads = (file) => {
-  let data = dataStorage.getStorage('taskList')
 
+  const data = dataStorage.getStorage('taskList')
+  let { name, size, type } = file
+  
   const reader = new FileReader();
   reader.readAsDataURL(file);
   
   reader.onload = () => {
-    let result = reader.result;
-    
-    data[props.indexSelected].taskDetails.files.push(result)
+
+    const newFile = {name:name,size:size,type:type,content:reader.result}
+
+    data[props.indexSelected].taskDetails.files.push(newFile)
     dataStorage.setStorage('taskList', data)
   };
 }
 
-const retrivesAndCreateURL = () => {
-  let file = dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files[0]
-  if(file){
-    const base64 = file.split(',')[1]
-    console.log(base64)
-    const decodify = btoa(base64)
-    console.log(decodify)
-    
-  }
-}
+// const retrivesAndCreateURL = () => {
+  
+
+// }
 
 onMounted(()=>{
   updatesPeriodically();
-  retrivesAndCreateURL() // continuar aqui, já salva falta recuperar e transformar em blob novamente
 })
 
 </script>
