@@ -14,7 +14,7 @@
                 <button class="button-check"></button>
               </div>
               <div class="w-[75%] break-words">
-                <input @click="cursorActive = !cursorActive" class="--input" :class="cursorActive ? 'cursor-auto' : 'cursor-default'" v-model="props.nameTaskSelected" />
+                <input @click="cursorActive = !cursorActive" class="--input" :class="cursorActive ? 'cursor-auto' : 'cursor-default'" v-model="props.objectSelected.nameTask" />
                 <!-- {{  }} adicionar nome da tarefa aqui -->
               </div>
               <button v-tippy="{ content: 'Marque a tarefa como importante', placement: 'top', delay: [300, 0], theme: 'light'}" class="w-5 h-5 flex justify-center items-center star-icon mr-5">
@@ -75,20 +75,20 @@
 
           <div class="upload-container">
 
-            <a v-for="ent in files" :key="ent?.id" :href="removeQuotes(ent?.content)" target="_blank" v-if="files.length" class="modal-group-upload" :class="displayUpload ? '' : 'upload-display-section'" @mouseenter="displayUpload = false" @mouseleave="displayUpload = true">
+            <button @click="openModalImage(ent)" v-for="(ent,index) in files" :key="ent?.id" v-if="files.length" class="modal-group-upload" :class="displayUpload || hoverIndex !== index ? '' : 'upload-display-section'" @mouseenter="displayUpload = false, hoverIndex = index" @mouseleave="displayUpload = true,hoverIndex = null">
               <div class="--selected">
                   <span>{{ ent.name.split('.')[1].toUpperCase() }}</span>
               </div>
-              <div class="--info">
-                <div class="truncate text-white text-opacity-45"><span class="text-sm">{{ ent?.name }}</span></div>
+              <div class="--info flex flex-col items-start truncate">
+                <div class="text-white text-opacity-45"><span class="text-sm">{{ ent?.name }}</span></div>
                 <div class="flex">
                   <span class="text-[12px] font-normal">{{ formatFileSize(ent?.size) }} - Arquivo</span>
                 </div>
               </div>
-              <button>
-                <XMarkIcon v-if="!displayUpload" class="--x-mark" />
+              <button @click.stop="deleteOneArquive(ent,index)">
+                <XMarkIcon v-if="!displayUpload && hoverIndex === index" class="--x-mark" />
               </button>
-            </a>
+            </button>
             <hr v-if="dataUpload !== null" class="opacity-15"/>
             <div class="modal-group-upload">
   
@@ -124,6 +124,15 @@
            <span>Criada Hoje</span>
           <button v-tippy="{ content: 'Excluír tarefa', placement: 'top', delay: [300, 0], theme: 'light'}"><TrashIcon class="--btn" /></button>
         </div>
+        <modalCenter v-if="openModalImageDetails" :isOpen="openModalImageDetails" @close="openModalImageDetails = $event" />
+        <modalConfirmDelete v-if="openDelete" :isOpen="openDelete" @close="openDelete = $event" :nameTask="arquiveDetails.name" @deleteTask="deleteTask">
+          <template #title>
+              Tem certeza de que deseja excluír este arquivo?
+            </template>
+            <template #body>
+              Voce não poderá desfazer esta ação.
+            </template>
+        </modalConfirmDelete>
       </section>
   </TransitionRoot>
 </template>
@@ -137,7 +146,9 @@ import {
         TransitionRoot, 
         TransitionChild 
     } from '@headlessui/vue'
-  import {ref,computed, onMounted, watch, readonly} from 'vue'
+  import modalCenter from '@/components/sections/modal/default/modalCenter.vue'
+  import modalConfirmDelete from '@/components/modal/modalConfirmDelete.vue'
+  import {ref,computed, onMounted, watch, provide} from 'vue'
   import dayjs from 'dayjs';
   import relativeTime from 'dayjs/plugin/relativeTime';
   import 'dayjs/locale/pt-br';
@@ -149,9 +160,8 @@ const props = defineProps({
     type:Boolean,
     default:false
   },
-  nameTaskSelected:{
-    type: String,
-    default: ''
+  objectSelected:{
+    type: Object
   },
   indexSelected:{
     type: Number
@@ -178,12 +188,55 @@ const fileName = ref('')
 const dataUpload = ref(null)
 const fileURL = ref('')
 const displayUpload = ref(false);
+const openModalImageDetails = ref(false);
+const arquiveDetails = ref({})
+const hoverIndex = ref(null)
+const arquiveDefault = ref('')
+const updateForce = ref(false)
+const openDelete = ref(false)
+const arquiveIndexSelected = ref(0)
+provide('arquiveDetails',arquiveDetails)
+provide('arquiveDefault',arquiveDefault)
+const arquivesDownloads = ref(['.jpg','jpeg','.png','.gif','.bmp','.svg','.webp','.txt','.csv','.html','.htm','.pdf','.xml','.json','.mp4','.webm','.ogg','.mp3','.wav','.aac'])
 
-const removeQuotes = (base64) => {
-  let result = base64.replace(/^"|"$/g, '')
-  return result
+function validArquives(arquive) {
+  for(let i = 0; i <= arquivesDownloads.value.length; i++) {
+    if(arquive.name.includes(arquivesDownloads.value[i])){
+      openModalImageDetails.value = true
+    }
+  }
+  if(!openModalImageDetails.value) {
+    window.open(arquive.content)
+  }
 }
 
+const openModalImage = (event) => {
+  arquiveDefault.value = event.name
+  arquiveDetails.value = event
+  validArquives(event)
+}
+
+const deleteOneArquive = (arquive,index) => {
+  arquiveDetails.value = arquive
+  arquiveIndexSelected.value = index
+  openDelete.value = !openDelete.value
+}
+
+const deleteTask = () => {
+
+  // files.value, props.objectSelected?.taskDetails?.files[arquiveIndexSelected.value],files.value[arquiveIndexSelected.value]
+
+  let storage = dataStorage.getStorage('taskList')
+
+  const taskSelected = {...props.objectSelected}
+
+  let result =  files.value.filter(item => item?.name !== props.objectSelected?.taskDetails?.files[arquiveIndexSelected.value]?.name)
+
+  storage[props.indexSelected].taskDetails.files = result
+  
+  dataStorage.setStorage('taskList', storage)
+  
+}
 
 let diffDay = ref(0)
 const previosTime = computed(() => {
@@ -209,10 +262,15 @@ const rules = computed(()=>{
   }
 })
 
-watch(()=>props.nameTaskSelected,()=>{
+watch(()=>props.objectSelected,()=>{
   console.log('entrei vou atualizar variavel')
   savedDate.value = dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime)
   taskModel.value = dataStorage.getStorage('taskList')[props.indexSelected]
+})
+
+watch(()=>updateForce.value,()=>{
+  files.value = dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files
+  console.log(files.value)
 })
 
 const dataInput = (event) => {
@@ -265,11 +323,11 @@ const saveUploads = (file) => {
   reader.readAsDataURL(file);
   
   reader.onload = () => {
-
     const newFile = {name:name,size:size,type:type,content:reader.result}
-
+    
     data[props.indexSelected].taskDetails.files.push(newFile)
     dataStorage.setStorage('taskList', data)
+    updateForce.value = !updateForce.value
   };
 }
 

@@ -68,10 +68,17 @@
             <div class="w-full flex justify-center" v-show="!displayCompleted"><div class="w-[97%] border-b border-white opacity-30"></div></div>
           </div>
           <modalOptions v-if="openModalOptionsSelected" :open="openModalOptionsSelected" @close="openModalOptionsSelected = $event" :modalTop="modalTop" :modalLeft="modalLeft" :modalRight="modalRight" :modalBottom="modalBottom" :statusActive="objSelected.important" @importantChecked="selectedStarItemDetails()" @removeDay="removeDay" @markCompleted="markCompleted($event)" :statusImportant="objSelected.completed" @completedToday="completedToday($event)" :todayConcluded="objSelected.concluded || objSelected.concludedToday" @removeTask="openDelete = true" @createListTask="createListTask()" />
-          <modalConfirmDelete v-if="openDelete" :isOpen="openDelete" @close="openDelete = $event" @closeOptions="openModalOptionsSelected = !openModalOptionsSelected" :nameTask="objSelected.nameTask" @deleteTask="deleteTask" />
+          <modalConfirmDelete v-if="openDelete" :isOpen="openDelete" @close="openDelete = $event" @closeOptions="openModalOptionsSelected = !openModalOptionsSelected" :nameTask="objSelected.nameTask" @deleteTask="deleteTask">
+            <template #title>
+              "{{ objSelected.nameTask }}" será definitivamente excluída.
+            </template>
+            <template #body>
+              Voce não poderá desfazer esta ação.
+            </template>
+          </modalConfirmDelete>
         </div>
     </div>
-    <modalDetailsLarge v-if="isOpenModalLarge" :isOpen="isOpenModalLarge" @closeDetails="isOpenModalLarge = $event" :nameTaskSelected="objSelected.nameTask" :indexSelected="buttons" />
+    <modalDetailsLarge v-if="isOpenModalLarge" :isOpen="isOpenModalLarge" @closeDetails="isOpenModalLarge = $event" :objectSelected="objSelected" :indexSelected="buttons" />
     <!-- <Loaderv2 /> -->
   </div>
 </template>

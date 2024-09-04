@@ -18,5 +18,14 @@ export const dataStorage = {
   },
   setStorage(key,data) {
     localStorage.setItem(key,JSON.stringify(data))
-  }
+  },
+  // removeArquiveStorage(array,objectEntries,index) {
+  //   let storage = this.getStorage('taskList')
+
+  //   storage = array.filter(item => item?.name !== objectEntries?.name)
+    
+  //   console.log(result)
+  //   console.log(storage)
+  //   // localStorage.setItem('taskList',JSON.stringify(result))
+  // }
 }
