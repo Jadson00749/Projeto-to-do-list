@@ -8,22 +8,24 @@
         <h1 class="w-[60px] text-center">To Do</h1>
       </div>
       <div class="navbar-section-input">
-        <input 
+        <div class="relative h-[65%]">
+          <input 
           v-model="eventInput" 
           v-tippy="{ content: 'Pesquisar', placement: 'left', delay: [300, 0], allowHTML: true, theme: 'search-tooltip'}"
           :placeholder="displayPlaceHolder" 
           @input="inputCaracters" 
           @click="visiblePlaceHolder()" 
           @blur="displayPlaceHolder = '', eventInput.length ? '' : inputClicked = false" 
-          class="h-[70%] w-[400px] rounded-md bg-[#222222] pl-10 border-transparent focus:outline-none search-tooltip" 
+          class="h-full w-[400px] rounded-md bg-[#222222] pl-10 border-transparent focus:outline-none search-tooltip" 
           :class="inputClicked ? 'cursor-auto' : 'cursor-pointer'" 
-        />
-        <button class="absolute mr-[30%]">
-          <MagnifyingGlassIcon class="w-5 h-5 text-blue-400" />
-        </button>
-        <button v-if="eventInput != ''" @click="limpForm()" class="absolute ml-[30%]">
-          <XMarkIcon class="w-4 h-4 text-blue-400" />
-        </button>
+          />
+          <button class="absolute left-2 h-full">
+            <MagnifyingGlassIcon class="w-5 h-5 text-blue-400" />
+          </button>
+          <button v-if="eventInput != ''" @click="limpForm()" class="absolute ml-[30%]">
+            <XMarkIcon class="w-4 h-4 text-blue-400" />
+          </button>
+        </div>
       </div>
       <div class="navbar-section-icons-container">
         <button v-tippy="{ content: 'Configurações', placement: 'bottom', delay: [300, 0], theme: 'light' }" class="navbar-section-icons-container-btn"><Cog6ToothIcon class="w-5 h-5" /></button>

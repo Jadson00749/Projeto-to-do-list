@@ -1,5 +1,6 @@
 <template>
   <div class="modal-content-container" :class="storeToDoList.getdisplayMenuLeft ? '!w-full ml-auto' : ''">
+    <Loaderv2 v-if="displayLoader" :open="displayLoader" />
     <sectionsSelectedDefault v-if="displayDefault()" />
     <myDays v-if="displayMyDays()" :displayIconSun="displayIconSun" />
     <Important v-if="displayImportant()" />
@@ -24,9 +25,10 @@ import FirstSteps from '@/components/sections/sectionsSelecteds/sectionsSelected
 import Shopping from '@/components/sections/sectionsSelecteds/sectionsSelecteds_Shopping.vue'
 import UntitledList from '@/components/sections/sectionsSelecteds/sectionsSelecteds_UntitledList.vue'
 import sectionsSelectedDefault from '@/components/sections/sectionsSelecteds/sectionsSelectedDefault.vue'
+import Loaderv2 from '@/components/Loaderv2.vue'
 
 import { toDoListStore } from '@/stores/toDoList.js'
-import {ref} from 'vue'
+import {ref,onMounted} from 'vue'
 
 const storeToDoList = toDoListStore();
 const displayMyDays = () => storeToDoList.getDisplayMyDays
@@ -39,7 +41,13 @@ const displayFirstSteps = () => storeToDoList.getdisplayFirstSteps
 const displayShopping = () => storeToDoList.getdisplayShopping
 const displayUntitled = () => storeToDoList.getdisplayUntitled
 const displayDefault = () => storeToDoList.getdisplayDefault
+const displayLoader = ref(true)
 
+onMounted(()=>{
+  setTimeout(()=>{
+    displayLoader.value = false
+  }, 1000)
+})
 
 </script>
 

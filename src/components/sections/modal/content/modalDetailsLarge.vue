@@ -7,7 +7,7 @@
       leave-from="translate-x-0"
       leave-to="translate-x-full">
       <section class="modal-details-container-section">
-        <div class="modal-details-container">
+        <div class="modal-details-container" ref="scrollMove">
           <div class="modal-details-group">
             <div class="modal-details-primary hover:bg-[#333333] flex justify-between" @mouseover="hoverActive = true" @mouseout="hoverActive = false">
               <div class="--button">
@@ -89,7 +89,7 @@
                 <XMarkIcon v-if="!displayUpload && hoverIndex === index" class="--x-mark" />
               </button>
             </button>
-            <hr v-if="dataUpload !== null" class="opacity-15"/>
+            <hr v-if="dataUpload !== null && files.length" class="opacity-15"/>
             <div class="modal-group-upload">
   
                 <button @click="uploadFilesActive" class="--btn" @mouseover="remindmeHoverActive = 5" @mouseout="remindmeHoverActive = 0">
@@ -110,7 +110,6 @@
             <div>
               <input placeholder="Adicionar anotação" @input="dataInput" v-model="taskModel.taskDetails.descr" />
                 <div v-if="taskModel.taskDetails.descr !== ''">
-                  <!-- <p>Atualizado há poucos segundos</p> -->
                   <p>{{ diffDay >= 30 ? 'Atualizado em' : 'Atualizado' }} {{ previosTime }}</p>
                 </div>
             </div>
@@ -121,7 +120,7 @@
         </div>
         <div class="container-bottom-section">
           <button @click="emit('closeDetails')" v-tippy="{ content: 'Ocultar exibição de detalhes', placement: 'top', delay: [300, 0], theme: 'light'}" ><ArrowRightEndOnRectangleIcon class="w-5 h-5 text-white" /></button>
-           <span>Criada Hoje</span>
+           <span>{{ diffDay >= 1 ? `Criado ${previosTime}` : 'Criado Hoje' }}</span>
           <button v-tippy="{ content: 'Excluír tarefa', placement: 'top', delay: [300, 0], theme: 'light'}"><TrashIcon class="--btn" /></button>
         </div>
         <modalCenter v-if="openModalImageDetails" :isOpen="openModalImageDetails" @close="openModalImageDetails = $event" />
@@ -148,7 +147,7 @@ import {
     } from '@headlessui/vue'
   import modalCenter from '@/components/sections/modal/default/modalCenter.vue'
   import modalConfirmDelete from '@/components/modal/modalConfirmDelete.vue'
-  import {ref,computed, onMounted, watch, provide} from 'vue'
+  import {ref,computed, onMounted, watch, provide, inject, nextTick } from 'vue'
   import dayjs from 'dayjs';
   import relativeTime from 'dayjs/plugin/relativeTime';
   import 'dayjs/locale/pt-br';
@@ -181,7 +180,6 @@ const taskModel = computed(()=> dataStorage.getStorage('taskList')[props.indexSe
 const savedDate = ref(dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime))
 const files = ref(dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files || [])
 const caractersInput = ref('')
-const forceUpdate = ref(false)
 const currentDate = ref(savedDate.value);
 const fileInput = ref(null)
 const fileName = ref('')
@@ -192,12 +190,15 @@ const openModalImageDetails = ref(false);
 const arquiveDetails = ref({})
 const hoverIndex = ref(null)
 const arquiveDefault = ref('')
-const updateForce = ref(false)
+const updateForceDetails = ref(false)
 const openDelete = ref(false)
 const arquiveIndexSelected = ref(0)
+const scrollMove = ref(null)
 provide('arquiveDetails',arquiveDetails)
 provide('arquiveDefault',arquiveDefault)
 const arquivesDownloads = ref(['.jpg','jpeg','.png','.gif','.bmp','.svg','.webp','.txt','.csv','.html','.htm','.pdf','.xml','.json','.mp4','.webm','.ogg','.mp3','.wav','.aac'])
+const forceUpdate = ref(inject('updateForce'))
+let diffDay = ref(0)
 
 function validArquives(arquive) {
   for(let i = 0; i <= arquivesDownloads.value.length; i++) {
@@ -223,22 +224,15 @@ const deleteOneArquive = (arquive,index) => {
 }
 
 const deleteTask = () => {
-
-  // files.value, props.objectSelected?.taskDetails?.files[arquiveIndexSelected.value],files.value[arquiveIndexSelected.value]
-
   let storage = dataStorage.getStorage('taskList')
 
-  const taskSelected = {...props.objectSelected}
-
-  let result =  files.value.filter(item => item?.name !== props.objectSelected?.taskDetails?.files[arquiveIndexSelected.value]?.name)
-
-  storage[props.indexSelected].taskDetails.files = result
+  storage[props.indexSelected].taskDetails.files = storage[props.indexSelected].taskDetails.files.filter(item => item?.name !== arquiveDetails.value?.name)
   
   dataStorage.setStorage('taskList', storage)
-  
+  openDelete.value = false
+  updateForceDetails.value = !updateForceDetails.value
 }
 
-let diffDay = ref(0)
 const previosTime = computed(() => {
   if (!savedDate.value) return null;
 
@@ -246,6 +240,7 @@ const previosTime = computed(() => {
   const diffInDays = now.diff(savedDate.value, 'day');
   
   diffDay.value = diffInDays
+
   if (diffInDays >= 30) {
     return savedDate.value.format('DD/MM/YYYY');
   } else {
@@ -268,14 +263,23 @@ watch(()=>props.objectSelected,()=>{
   taskModel.value = dataStorage.getStorage('taskList')[props.indexSelected]
 })
 
-watch(()=>updateForce.value,()=>{
+watch(()=>forceUpdate.value,async()=>{
   files.value = dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files
-  console.log(files.value)
+  await nextTick()
+  if(scrollMove.value){
+    scrollMove.value.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+})
+
+watch(()=>updateForceDetails.value,async()=>{
+  files.value = dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files
 })
 
 const dataInput = (event) => {
   console.log('entrei digitei input')
-  forceUpdate.value = !forceUpdate.value
   caractersInput.value = event.target.value
 
   let result = dataStorage.getStorage('taskList') || []
@@ -312,6 +316,7 @@ const uploadFiles = (event) => {
     saveUploads(dataUpload.value[0]);
     
   } else fileName.value = ''
+  updateForceDetails.value = !updateForceDetails.value
 }
 
 const saveUploads = (file) => {
@@ -327,14 +332,9 @@ const saveUploads = (file) => {
     
     data[props.indexSelected].taskDetails.files.push(newFile)
     dataStorage.setStorage('taskList', data)
-    updateForce.value = !updateForce.value
+    updateForceDetails.value = !updateForceDetails.value
   };
 }
-
-// const retrivesAndCreateURL = () => {
-  
-
-// }
 
 onMounted(()=>{
   updatesPeriodically();
@@ -412,8 +412,16 @@ onMounted(()=>{
   @apply mt-2;
 }
 
+.upload-container .modal-group-upload:nth-child(1) {
+  @apply rounded-t-[5px];
+}
+
+.upload-container .modal-group-upload:nth-last-child(1) {
+  @apply rounded-b-[5px] border-none;
+}
+
 .upload-container .modal-group-upload {
-  @apply w-full h-[52px] flex gap-3 bg-[#272727] hover:bg-[#333333] rounded-[5px] transition-all duration-75;
+  @apply w-full h-[52px] flex gap-3 bg-[#272727] hover:bg-[#333333] transition-all duration-75 border-b-[0.5px] border-[#444444] border-opacity-75;
 }
 
 .upload-container .modal-group-upload .--btn {
@@ -464,7 +472,7 @@ onMounted(()=>{
 }
 
 .text-area-button {
-  @apply w-full p-4 mt-2 bg-[#272727] hover:border-[1px] hover:border-white hover:border-opacity-25 rounded-[5px];
+  @apply w-full p-4 my-2 bg-[#272727] hover:border-[1px] hover:border-white hover:border-opacity-25 rounded-[5px];
 } 
 
 

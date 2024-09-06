@@ -79,7 +79,7 @@
         </div>
     </div>
     <modalDetailsLarge v-if="isOpenModalLarge" :isOpen="isOpenModalLarge" @closeDetails="isOpenModalLarge = $event" :objectSelected="objSelected" :indexSelected="buttons" />
-    <!-- <Loaderv2 /> -->
+    <!-- <Loaderv2 :open="true" /> -->
   </div>
 </template>
 
@@ -88,7 +88,7 @@ import modalOptions from '@/components/modal/modalOptions.vue'
 import modalDetailsLarge from '@/components/sections/modal/content/modalDetailsLarge.vue'
 import Loaderv2 from '@/components/Loaderv2.vue'
 import { StarIcon, CheckIcon, ChevronRightIcon, ChevronDownIcon, CalendarDaysIcon } from '@heroicons/vue/24/solid'
-import {ref, onMounted, watch,computed, onBeforeMount} from 'vue';
+import {ref, onMounted, watch,computed, onBeforeMount, provide } from 'vue';
 import { toDoListStore } from '@/stores/toDoList.js'
 import commonHeader from '@/components/sections/commonHeaders/commonHeader.vue'
 import tableMyDays from '@/components/sections/table/table_MyDays.vue'
@@ -125,6 +125,7 @@ const modalBottom = ref(0)
 const objSelected = ref(null)
 const IndexSelected = ref(null)
 const stateList = ref('');
+provide('updateForce',updateForce)
 
 watch(()=>updateForce.value,()=>{
   listTask.value = dataStorage.getStorage('taskList')
@@ -140,6 +141,7 @@ const selectedItem = (event,index) => {
   objSelected.value = event
   buttonsCompleted.value = null
   isOpenModalLarge.value = true
+  updateForce.value = !updateForce.value
 }
 
 const selectedItemCompleted = (index) => {
