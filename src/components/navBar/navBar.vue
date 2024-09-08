@@ -16,14 +16,14 @@
           @input="inputCaracters" 
           @click="visiblePlaceHolder()" 
           @blur="displayPlaceHolder = '', eventInput.length ? '' : inputClicked = false" 
-          class="h-full w-[400px] rounded-md bg-[#222222] pl-10 border-transparent focus:outline-none search-tooltip" 
+          class="h-full w-[400px] rounded-[4px] bg-[#222222] pl-10 border-transparent focus:outline-none place-holder-adjustment" 
           :class="inputClicked ? 'cursor-auto' : 'cursor-pointer'" 
           />
           <button class="absolute left-2 h-full">
             <MagnifyingGlassIcon class="w-5 h-5 text-blue-400" />
           </button>
-          <button v-if="eventInput != ''" @click="limpForm()" class="absolute ml-[30%]">
-            <XMarkIcon class="w-4 h-4 text-blue-400" />
+          <button v-if="eventInput != ''"  @click="limpForm()" class="absolute left-[94%] top-[7px]" v-tippy="{ content: 'Sair da pesquisa', placement: 'bottom', delay: [300, 0], theme: 'light'}">
+            <XMarkIcon class="w-[17px] h-[17px] text-blue-400" />
           </button>
         </div>
       </div>
@@ -96,6 +96,10 @@ const visiblePlaceHolder = () => {
  
 .navbar-section-icons-container-btn {
   @apply w-[25%] flex justify-center items-center;
+}
+
+.place-holder-adjustment::placeholder {
+  @apply font-[360] text-[14.5px] ;
 }
 
 </style>

@@ -31,9 +31,7 @@
               class="min-w-[286px] h-[174px] max-h-[174px] transform overflow-hidden rounded-[4px] bg-[#222222] text-left align-middle shadow-xl transition-all border border-white border-opacity-30"
             >
             <div class="w-full h-20 p-4 flex flex-col gap-2 break-wordsz">
-              <!-- <span class="text-white text-[14px] font-semibold">"{{ nameTask }}" será definitivamente excluída.</span> -->
               <span class="text-white text-[14px] font-semibold"><slot name="title" /></span>
-              <!-- <span class="text-white opacity-50 text-[15px] text-sm">Voce não poderá desfazer esta ação.</span> -->
               <span class="text-white opacity-50 text-[15px] text-sm"><slot name="body" /></span>
             </div>
               <div class="h-16 p-4">

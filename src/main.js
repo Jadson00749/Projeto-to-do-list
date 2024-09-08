@@ -4,8 +4,7 @@ import tippy from 'tippy.js'
 import 'tippy.js/dist/tippy.css';
 import App from './App.vue'
 import '@/assets/main.css'
-// import { createVuePlugin } from 'unplugin-vue-components/vite';
-// import { createAutoImportPlugin } from 'unplugin-auto-import/vite';
+import router from '@/router/index.js'; 
 
 const app = createApp(App)
 app.directive('tippy', {
@@ -23,15 +22,7 @@ app.directive('tippy', {
 
 const pinia = createPinia()
 
-// app.use(createVuePlugin([
-//   'src/**/*.vue' 
-// ]));
-
 app.use(pinia)
-// app.use(createAutoImportPlugin({
-//   imports: [
-//     'vue'
-//   ],
-// }));
-// app.use(newTippy)
+app.use(router)
+
 app.mount('#app')

@@ -32,7 +32,7 @@
             :class="widthImage ? 'w-full h-full transition-none' : 'max-w-[70%] h-[85%]'"
             >
             <span class="w-full h-[12%] flex justify-between items-center">
-              <p class="text-white font-semibold opacity-75 !text-[15px]">Screenshot_6.png</p>
+              <p class="text-white font-semibold opacity-75 !text-[15px]">{{ imageDetails?.name }}</p>
               <button class="flex gap-1">
                 <ArrowsPointingOutIcon v-if="widthImage" @click="widthImage = !widthImage" v-tippy="{ content: 'Minimizar', placement: 'top', delay: [300, 0], theme: 'light'}"  class="w-5 h-5 text-white mr-2 opacity-75"/>
                 <ArrowsPointingInIcon v-if="!widthImage" @click="widthImage = !widthImage" v-tippy="{ content: 'Maximizar', placement: 'top', delay: [300, 0], theme: 'light'}"  class="w-5 h-5 text-white mr-2 opacity-75"/>

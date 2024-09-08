@@ -46,7 +46,7 @@ const displayLoader = ref(true)
 onMounted(()=>{
   setTimeout(()=>{
     displayLoader.value = false
-  }, 1000)
+  }, 3000)
 })
 
 </script>

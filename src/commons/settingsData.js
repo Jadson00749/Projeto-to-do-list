@@ -1,5 +1,3 @@
-import { computed } from "vue";
-
 export function formatFileSize(sizeInBytes) {
   if (sizeInBytes < 1024) {
     return `${sizeInBytes}B`;
