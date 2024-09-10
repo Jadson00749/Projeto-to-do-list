@@ -13,3 +13,7 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-[#444444];
 }
+
+#nprogress .bar {
+  @apply h-[2.5px] bg-blue-500;
+}

@@ -11,7 +11,7 @@
                     <div class="w-full h-full pt-2 flex flex-col" >
                       <button @contextmenu.prevent="openModalOptions($event,index,ent,'notCompleted')" @click="selectedItem(ent,index)" :class="buttons === index ? 'bg-[#333333]' : ''" class="w-full min-h-[52px] text-white rounded-[4px] bg-[#222222] pl-5 flex justify-start items-center hover:bg-[#333333] transition-all duration-300 py-2">
                           <div @mouseover="checkButtons = index" @mouseout="checkButtons = !index" class="w-7 h-7 flex justify-center items-center">
-                            <div @click="tasksCompleted(index,ent)" class="w-[60%] h-[60%] rounded-full border border-blue-300 flex justify-center items-center">
+                            <div @click.stop="tasksCompleted(index,ent)" class="w-[60%] h-[60%] rounded-full border border-blue-300 flex justify-center items-center">
                               <CheckIcon v-show="checkButtons === index" class="w-[10px] h-[10px] text-blue-300" />
                             </div>
                           </div>
@@ -37,7 +37,7 @@
                   </div>
                 </div>
           </transition>
-          <div v-if="listTaskCompleted && !loading()" class="w-full h-[17%]">
+          <div v-if="listTaskCompleted.length && !loading()" class="w-full h-[17%]">
             <div @click="displayCompleted = !displayCompleted" class="w-full h-[70%] flex justify-start items-center cursor-pointer">
               <button v-if="!displayCompleted" class="w-7 h-[60%] flex justify-center items-center"><ChevronRightIcon class="w-4 h-4 text-white opacity-50" /></button>
               <button v-if="displayCompleted" class="w-7 h-[60%] flex justify-center items-center"><ChevronDownIcon class="w-4 h-4 text-white opacity-50" /></button>
@@ -46,7 +46,7 @@
                 <p class="text-white font-sm text-[14px] opacity-45">{{ listTaskCompleted.length }}</p>
               </button>
             </div>
-            <div v-if="listTaskCompleted && displayCompleted" class="w-full h-full flex flex-col gap-2 mb-8 pb-3">
+            <div v-if="listTaskCompleted.length && displayCompleted" class="w-full h-full flex flex-col gap-2 mb-8 pb-3">
               <div v-for="(ent,index) in listTaskCompleted" :key="index.id">
                 <button @contextmenu.prevent="openModalOptions($event,index,ent,'completed')" @click="selectedItemCompleted(index)" :class="buttonsCompleted === index ? 'bg-[#333333]' : ''" class="w-full h-[54px] text-white rounded-[4px] bg-[#222222] pl-5 flex justify-start items-center hover:bg-[#333333] transition-all duration-300">
                     <div @mouseover="checkButtons = index" @mouseout="checkButtons = !index" class="w-7 h-7 flex justify-center items-center">
@@ -99,8 +99,8 @@ import { dataStorage } from '@/commons/settingsData';
 
 const storeToDoList = toDoListStore()
 const displayMyDays = () => ref(storeToDoList.getDisplayMyDays)
-const listTask = ref(dataStorage.getStorage('taskList'))
-const listTaskCompleted = ref(dataStorage.getStorage('taskCompleted'))
+const listTask = ref(dataStorage.getStorage('taskList') || [])
+const listTaskCompleted = ref(dataStorage.getStorage('taskCompleted') || [])
 const taskCreated = () => storeToDoList.getmyDaysCreated
 const loading = () => storeToDoList.getLoading
 const setLoading = (val) => storeToDoList.setLoading(val)

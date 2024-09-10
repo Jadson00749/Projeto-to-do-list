@@ -3,8 +3,21 @@ import { createPinia } from 'pinia'
 import tippy from 'tippy.js'
 import 'tippy.js/dist/tippy.css';
 import App from './App.vue'
+import router from '@/router/index.js';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 import '@/assets/main.css'
-import router from '@/router/index.js'; 
+
+NProgress.configure({ showSpinner: false, speed: 1200, trickleSpeed: 1200 });
+
+router.beforeEach((to, from, next) => {
+  NProgress.start();
+  next();
+});
+
+router.afterEach(() => {
+  NProgress.done();
+});
 
 const app = createApp(App)
 app.directive('tippy', {

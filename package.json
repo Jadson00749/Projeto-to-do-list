@@ -18,6 +18,7 @@
     "dayjs": "^2.0.0-alpha.4",
     "dropzone": "^6.0.0-beta.2",
     "howler": "^2.2.4",
+    "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",

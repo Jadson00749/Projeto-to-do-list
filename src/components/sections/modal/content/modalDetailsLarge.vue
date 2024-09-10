@@ -177,7 +177,7 @@ const placeHolderActive = ref(false)
 const dayHoverActive = ref(false)
 const remindmeHoverActive = ref(0)
 const taskModel = computed(()=> dataStorage.getStorage('taskList')[props.indexSelected])
-const savedDate = ref(dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime))
+const savedDate = ref(dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime) || "")
 const files = ref(dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files || [])
 const caractersInput = ref('')
 const currentDate = ref(savedDate.value);
