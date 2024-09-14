@@ -176,9 +176,10 @@ const hoverActive = ref(false)
 const placeHolderActive = ref(false)
 const dayHoverActive = ref(false)
 const remindmeHoverActive = ref(0)
-const taskModel = computed(()=> dataStorage.getStorage('taskList')[props.indexSelected])
-const savedDate = ref(dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime) || "")
-const files = ref(dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files || [])
+const key = () => storeToDoList.getKeyName
+const taskModel = computed(()=> dataStorage.getStorage(key())[props.indexSelected])
+const savedDate = ref(dayjs(dataStorage.getStorage(key())[props.indexSelected].updateTime) || "")
+const files = ref(dataStorage.getStorage(key())[props.indexSelected].taskDetails.files || [])
 const caractersInput = ref('')
 const currentDate = ref(savedDate.value);
 const fileInput = ref(null)
@@ -224,11 +225,11 @@ const deleteOneArquive = (arquive,index) => {
 }
 
 const deleteTask = () => {
-  let storage = dataStorage.getStorage('taskList')
+  let storage = dataStorage.getStorage(key())
 
   storage[props.indexSelected].taskDetails.files = storage[props.indexSelected].taskDetails.files.filter(item => item?.name !== arquiveDetails.value?.name)
   
-  dataStorage.setStorage('taskList', storage)
+  dataStorage.setStorage(key(), storage)
   openDelete.value = false
   updateForceDetails.value = !updateForceDetails.value
 }
@@ -259,12 +260,12 @@ const rules = computed(()=>{
 
 watch(()=>props.objectSelected,()=>{
   console.log('entrei vou atualizar variavel')
-  savedDate.value = dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime)
-  taskModel.value = dataStorage.getStorage('taskList')[props.indexSelected]
+  savedDate.value = dayjs(dataStorage.getStorage(key())[props.indexSelected].updateTime)
+  taskModel.value = dataStorage.getStorage(key())[props.indexSelected]
 })
 
 watch(()=>forceUpdate.value,async()=>{
-  files.value = dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files
+  files.value = dataStorage.getStorage(key())[props.indexSelected].taskDetails.files
   await nextTick()
   if(scrollMove.value){
     scrollMove.value.scrollTo({
@@ -275,20 +276,20 @@ watch(()=>forceUpdate.value,async()=>{
 })
 
 watch(()=>updateForceDetails.value,async()=>{
-  files.value = dataStorage.getStorage('taskList')[props.indexSelected].taskDetails.files
+  files.value = dataStorage.getStorage(key())[props.indexSelected].taskDetails.files
 })
 
 const dataInput = (event) => {
   console.log('entrei digitei input')
   caractersInput.value = event.target.value
 
-  let result = dataStorage.getStorage('taskList') || []
+  let result = dataStorage.getStorage(key()) || []
   result[props.indexSelected].updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss')  
   result[props.indexSelected].taskDetails.descr = caractersInput.value
-  dataStorage.setStorage('taskList', result)
+  dataStorage.setStorage(key(), result)
 
-  savedDate.value = dayjs(dataStorage.getStorage('taskList')[props.indexSelected].updateTime)
-  taskModel.value = dataStorage.getStorage('taskList')[props.indexSelected]
+  savedDate.value = dayjs(dataStorage.getStorage(key())[props.indexSelected].updateTime)
+  taskModel.value = dataStorage.getStorage(key())[props.indexSelected]
 }
 
 const updatesPeriodically = () => {
@@ -321,7 +322,7 @@ const uploadFiles = (event) => {
 
 const saveUploads = (file) => {
 
-  const data = dataStorage.getStorage('taskList')
+  const data = dataStorage.getStorage(key())
   let { name, size, type } = file
   
   const reader = new FileReader();
@@ -331,7 +332,7 @@ const saveUploads = (file) => {
     const newFile = {name:name,size:size,type:type,content:reader.result}
     
     data[props.indexSelected].taskDetails.files.push(newFile)
-    dataStorage.setStorage('taskList', data)
+    dataStorage.setStorage(key(), data)
     updateForceDetails.value = !updateForceDetails.value
   };
 }

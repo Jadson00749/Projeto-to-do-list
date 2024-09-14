@@ -5,14 +5,14 @@
           <div v-if="displayInput()" class="w-4 h-4 rounded-full border-[1px] ml-6 border-blue-300"></div>
           <PlusIcon v-if="!displayInput()" class="w-5 h-5 ml-6 text-blue-300"/>
           <input
-          v-model="enableAddition"
-          placeholder="Adicionar uma tarefa"
-          @click="activeInput()"
-          @blur="placeHolderActive = true"
-          @input="inputValueTask"
-          :class="placeHolderActive ? 'placeholder-active' : 'placeholder-desactive'"
-          class="w-[95%] h-[72%] text-white rounded-s-sm bg-[#222222] pl-4 border-transparent focus:outline-none" 
-          >
+            v-model="enableAddition"
+            placeholder="Adicionar uma tarefa"
+            @click="activeInput()"
+            @blur="placeHolderActive = true"
+            @input="inputValueTask"
+            :class="placeHolderActive ? 'placeholder-active' : 'placeholder-desactive'"
+            class="w-[95%] h-[72%] text-white rounded-s-sm bg-[#222222] pl-4 border-transparent focus:outline-none" 
+            >
         </div>
         <transition 
         name="slide"
@@ -52,7 +52,7 @@ const emit = defineEmits('getList')
 const storeToDoList = toDoListStore()
 const placeHolderActive = ref(true)
 const enableAddition = ref('')
-const taskObject = ref([])
+const key = () => storeToDoList.getKeyName
 const listValues = ref([])
 const id = ref(0)
 const listTask = (val) => storeToDoList.setmyDaysCreated(val)
@@ -65,7 +65,7 @@ const inputValueTask = (event) => {
 }
 
 const createTask = () => {
-  objLocalStorage.value = dataStorage.getStorage('taskList')
+  objLocalStorage.value = dataStorage.getStorage(key())
   let obj = {
     id: id.value += 1,
     nameTask: enableAddition.value,
@@ -84,9 +84,9 @@ const createTask = () => {
       listValues.value = objLocalStorage.value
       listValues.value.push(obj)
       listValues.value.sort((a,b) => b?.id - a?.id)
-      dataStorage.setStorage('taskList', listValues.value)
+      dataStorage.setStorage(key(), listValues.value)
     }else {
-      dataStorage.setStorage('taskList', [obj])
+      dataStorage.setStorage(key(), [obj])
     }
     enableAddition.value = ''
     emit('getList')
@@ -107,7 +107,7 @@ const rules = computed(()=>{
 })
 
 onBeforeMount(()=>{
-  objLocalStorage.value = dataStorage.getStorage('taskList')
+  objLocalStorage.value = dataStorage.getStorage(key())
   taskCompleted.value = dataStorage.getStorage('taskCompleted')
   if(objLocalStorage.value){
     id.value = objLocalStorage.value[0]?.id

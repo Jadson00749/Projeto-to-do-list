@@ -2,6 +2,7 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+
 /* .tippy-box {
   @apply rounded-sm border border-red-500;
 } */
@@ -17,3 +18,4 @@
 #nprogress .bar {
   @apply h-[2.5px] bg-blue-500;
 }
+

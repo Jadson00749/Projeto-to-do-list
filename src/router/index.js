@@ -3,7 +3,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 const routes = [
   {
     path: '/',
-    component: () => import('@/views/login/login.vue')
+    component: () => import('@/views/login/login.vue'),
+    meta: {
+      title: 'Login - To Do'
+    }
   },
   {
     path: '/register',
@@ -19,5 +22,9 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 });
+
+// router.afterEach((to) => {
+//   document.title = to.meta.title
+// })
 
 export default router

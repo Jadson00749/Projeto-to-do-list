@@ -21,7 +21,8 @@ export const toDoListStore = defineStore("toDoListStores",{
     myDaysCreated: [],
     newListTaskCreated: [],
     inputDisplay: true,
-    createListTaskDisplay:false
+    createListTaskDisplay:false,
+    keyName: ''
   }),
 
   actions:{
@@ -42,6 +43,7 @@ export const toDoListStore = defineStore("toDoListStores",{
     setListTaskDisplay(playload){this.createListTaskDisplay = playload},
     setNewListTaskCreated(playload){this.newListTaskCreated = playload},
     setDisplayLoader(playload){this.displayLoader = playload},
+    setKeyName(playload){this.keyName = playload},
     setTabs(playload){
       let result = this.tabs.filter(val => val.id === playload)
       return result
@@ -66,7 +68,8 @@ export const toDoListStore = defineStore("toDoListStores",{
     getListTaskDisplay:(state)=> state.createListTaskDisplay,
     getNewListTaskCreated:(state)=> state.newListTaskCreated,
     getTabs:(state)=> state.tabs,
-    getDisplayLoader:(state) => state.displayLoader
+    getDisplayLoader:(state) => state.displayLoader,
+    getKeyName:(state) => state.keyName
   }
   
 })

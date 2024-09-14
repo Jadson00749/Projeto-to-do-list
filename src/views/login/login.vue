@@ -8,11 +8,11 @@
         </div>
         <div class="--content">
           <div class="relative">
-            <input placeholder="Email" class="place-holder-adjustment" @input="userEmail = $event.target.value" :class="userEmail !== '' ? 'border-transparent' : 'border-red-400'" />
+            <input placeholder="Email" class="place-holder-adjustment" v-model="user.email" :class="!validActive ? 'border border-transparent' : 'border !border-red-300'" />
             <UserIcon class="w-6 h-6 text-white absolute top-3 left-3 opacity-40" />
           </div>
           <div class="relative">
-            <input :type="typePassWord ? '' : 'password'" @input="userPassword = $event?.target.value" placeholder="Password" class="place-holder-adjustment" :class="userPassword !== '' ? 'border-transparent' : 'border-red-400'" />
+            <input :type="typePassWord ? '' : 'password'" v-model="user.password" placeholder="Password" class="place-holder-adjustment" :class="!validActive ? 'border border-transparent' : 'border !border-red-300'" />
             <LockClosedIcon class="w-[21px] h-[21px] text-white absolute top-3 left-3 opacity-40" />
             
             <button @click="typePassWord = !typePassWord">
@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="--actions absolute">
-          <button @click="router.push('./tasks')">Sign in</button>
+          <button @click="login()">Sign in</button>
           <div class="relative">
             <button><span class="ml-8">Sign in with Google</span></button>
             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25px" height="25px" viewBox="0 0 48 48" class="absolute top-6 left-[80px]">
@@ -38,13 +38,46 @@
 
 <script setup>
 import { UserIcon, KeyIcon, EyeIcon, EyeSlashIcon, LockClosedIcon } from '@heroicons/vue/24/solid';
-import { ref } from 'vue'
-import { useRouter } from "vue-router"; 
+import { ref, computed, watch } from 'vue'
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
+import { dataStorage } from '@/commons/settingsData';
+import { toDoListStore } from '@/stores/toDoList';
 
+const storeToDoList = toDoListStore();
+const toast = useToast();
 const router = useRouter();
 const typePassWord = ref(false)
-const userEmail = ref(null)
-const userPassword = ref(null)
+const validActive = ref(false)
+const storages = ref(dataStorage.biggestId().storages)
+const user = ref({
+  email: '',
+  password: ''
+})
+
+function login() {
+  if(!user.value.email || !user.value.password ) {
+    validActive.value = true
+    return toast.error('Preencha todos os campos obrigatórios!')
+  } {
+    validActive.value = false
+    let emailFound = false;
+
+    for(let i = 0; i < storages.value.length; i++) {
+      
+      if(user.value?.email === storages.value[i]?.value[0].email && user.value?.password === storages.value[i]?.value[0].password){
+        emailFound = true;
+        toast.success('Bem vindo (a) ao Power To Do.')
+        storeToDoList.setKeyName(storages.value[i].key)
+        router.push('/tasks')
+        break
+      }
+    }
+    if(!emailFound) {
+      toast.error('Nome de usuário ou senha incorretos.')
+    }
+  }
+}
 
 </script>
 

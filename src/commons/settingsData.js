@@ -17,13 +17,23 @@ export const dataStorage = {
   setStorage(key,data) {
     localStorage.setItem(key,JSON.stringify(data))
   },
-  // removeArquiveStorage(array,objectEntries,index) {
-  //   let storage = this.getStorage('taskList')
+  biggestId() {
+    let maxId = 0
+    const items = [];
 
-  //   storage = array.filter(item => item?.name !== objectEntries?.name)
-    
-  //   console.log(result)
-  //   console.log(storage)
-  //   // localStorage.setItem('taskList',JSON.stringify(result))
-  // }
+    for(let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      const value = localStorage.getItem(key)
+      const numericKey = Number(key)
+
+      if(!isNaN(numericKey) && numericKey > maxId) {
+        maxId = numericKey
+      }    
+      items.push({ key, value: JSON.parse(value) })     
+    }
+    return {
+      storages: items,
+      maxId: maxId
+    };
+  } /// continuar daqui depois
 }

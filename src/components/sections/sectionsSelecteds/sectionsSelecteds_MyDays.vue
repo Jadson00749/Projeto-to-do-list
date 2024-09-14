@@ -7,7 +7,7 @@
         <div class=" h-[calc(100%-31%)] px-6 pt-1 overflow-auto z-auto" :class="isOpenModalLarge ? 'w-[calc(100%-30%)]' : 'w-full'" >
           <transition name="slide">
               <div v-if="listTask !== null && !loading()" class="mb-6">
-                  <div v-for="(ent,index) in listTask" :key="index">
+                  <div v-for="(ent,index) in listTask.slice(1)" :key="index">
                     <div class="w-full h-full pt-2 flex flex-col" >
                       <button @contextmenu.prevent="openModalOptions($event,index,ent,'notCompleted')" @click="selectedItem(ent,index)" :class="buttons === index ? 'bg-[#333333]' : ''" class="w-full min-h-[52px] text-white rounded-[4px] bg-[#222222] pl-5 flex justify-start items-center hover:bg-[#333333] transition-all duration-300 py-2">
                           <div @mouseover="checkButtons = index" @mouseout="checkButtons = !index" class="w-7 h-7 flex justify-center items-center">
@@ -99,7 +99,8 @@ import { dataStorage } from '@/commons/settingsData';
 
 const storeToDoList = toDoListStore()
 const displayMyDays = () => ref(storeToDoList.getDisplayMyDays)
-const listTask = ref(dataStorage.getStorage('taskList') || [])
+const key = () => storeToDoList.getKeyName
+const listTask = ref(dataStorage.getStorage(key()) || [])
 const listTaskCompleted = ref(dataStorage.getStorage('taskCompleted') || [])
 const taskCreated = () => storeToDoList.getmyDaysCreated
 const loading = () => storeToDoList.getLoading
@@ -128,7 +129,7 @@ const stateList = ref('');
 provide('updateForce',updateForce)
 
 watch(()=>updateForce.value,()=>{
-  listTask.value = dataStorage.getStorage('taskList')
+  listTask.value = dataStorage.getStorage(key())
   listTaskCompleted.value = dataStorage.getStorage('taskCompleted')
 })
 
@@ -225,7 +226,7 @@ const tasksCompleted = (event,ent) => {
   listTaskCompleted.value.push(ent)
   dataStorage.setStorage('taskCompleted', listTaskCompleted.value)
   result = listTask.value.filter(item => item?.id !== ent?.id)
-  dataStorage.setStorage('taskList', result)
+  dataStorage.setStorage(key(), result)
   updateForce.value = !updateForce.value
   notificationSounds.seek(0.6)
   notificationSounds.play()
@@ -236,7 +237,7 @@ const markOfTask = (ent,event) => {
   let result = []
   listTaskCompleted.value[event].completed = false
   listTask.value.push(ent)
-  dataStorage.setStorage('taskList', listTask.value)
+  dataStorage.setStorage(key(), listTask.value)
   result = listTaskCompleted.value.filter(item => item?.id !== ent?.id)
   dataStorage.setStorage('taskCompleted', result)
   updateForce.value = !updateForce.value
@@ -281,7 +282,7 @@ const removeDay = () => {
   let result = []
   if(stateList.value === 'notCompleted'){
     result = listTask.value.filter(item => item?.id !== objSelected.value?.id)
-    dataStorage.setStorage('taskList', result)
+    dataStorage.setStorage(key(), result)
   } else {
     result = listTaskCompleted.value.filter(item => item?.id !== objSelected.value?.id)
     dataStorage.setStorage('taskCompleted', result)
@@ -297,12 +298,12 @@ const markCompleted = (event) => {
     listTaskCompleted.value.push(objSelected.value)
     dataStorage.setStorage('taskCompleted', listTaskCompleted.value)
     result = listTask.value.filter(item => item?.id !== objSelected.value?.id)
-    dataStorage.setStorage('taskList', result)
+    dataStorage.setStorage(key(), result)
   } 
   else {
     listTaskCompleted.value[IndexSelected.value].completed = false
     listTask.value.push(objSelected.value)
-    dataStorage.setStorage('taskList', listTask.value)
+    dataStorage.setStorage(key(), listTask.value)
     result = listTaskCompleted.value.filter(item => item?.id !== objSelected.value?.id)
     dataStorage.setStorage('taskCompleted', result)
   }
@@ -336,7 +337,7 @@ const deleteTask = () => {
   // setLoading(true)
   if(stateList.value === 'notCompleted'){
     let result = listTask.value.filter(item => item?.id !== objSelected.value?.id)
-    dataStorage.setStorage('taskList', result)
+    dataStorage.setStorage(key(), result)
   } else {
     let result = listTaskCompleted.value.filter(item => item?.id !== objSelected.value?.id)
     dataStorage.setStorage('taskCompleted', result)

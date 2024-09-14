@@ -28,7 +28,10 @@ import sectionsSelectedDefault from '@/components/sections/sectionsSelecteds/sec
 import Loaderv2 from '@/components/Loaderv2.vue'
 
 import { toDoListStore } from '@/stores/toDoList.js'
-import {ref,onMounted} from 'vue'
+import {ref,onMounted,computed,watch} from 'vue'
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const storeToDoList = toDoListStore();
 const displayMyDays = () => storeToDoList.getDisplayMyDays
@@ -42,6 +45,24 @@ const displayShopping = () => storeToDoList.getdisplayShopping
 const displayUntitled = () => storeToDoList.getdisplayUntitled
 const displayDefault = () => storeToDoList.getdisplayDefault
 const displayLoader = ref(true)
+
+const defineMetaTitle = computed(()=>{
+  if(storeToDoList.getDisplayMyDays) return 'Meu dia - To Do'
+  return 'Tarefa não encontrada - To Do'
+})
+
+// watch(()=>returnStateTabs(),()=>{
+//    console.log('Meu dia - To Do')
+// })
+
+// function defineMetaTitle(){
+//   if(storeToDoList.getDisplayMyDays) return 'Meu dia - To Do'
+//   return 'Tarefa não encontrada - To Do' 
+// } // depois cntinuar aqui 
+
+router.afterEach((to) => {
+  document.title = defineMetaTitle.value
+})
 
 onMounted(()=>{
   setTimeout(()=>{
