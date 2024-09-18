@@ -35,5 +35,5 @@ export const dataStorage = {
       storages: items,
       maxId: maxId
     };
-  } /// continuar daqui depois
+  }
 }

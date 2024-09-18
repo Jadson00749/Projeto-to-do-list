@@ -100,7 +100,7 @@ import { dataStorage } from '@/commons/settingsData';
 const storeToDoList = toDoListStore()
 const displayMyDays = () => ref(storeToDoList.getDisplayMyDays)
 const key = () => storeToDoList.getKeyName
-const listTask = ref(dataStorage.getStorage(key()) || [])
+const listTask = ref(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id) || [])
 const listTaskCompleted = ref(dataStorage.getStorage('taskCompleted') || [])
 const taskCreated = () => storeToDoList.getmyDaysCreated
 const loading = () => storeToDoList.getLoading
@@ -129,7 +129,7 @@ const stateList = ref('');
 provide('updateForce',updateForce)
 
 watch(()=>updateForce.value,()=>{
-  listTask.value = dataStorage.getStorage(key())
+  listTask.value = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)
   listTaskCompleted.value = dataStorage.getStorage('taskCompleted')
 })
 

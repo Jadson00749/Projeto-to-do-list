@@ -64,14 +64,24 @@ function login() {
     let emailFound = false;
 
     for(let i = 0; i < storages.value.length; i++) {
-      
-      if(user.value?.email === storages.value[i]?.value[0].email && user.value?.password === storages.value[i]?.value[0].password){
-        emailFound = true;
-        toast.success('Bem vindo (a) ao Power To Do.')
-        storeToDoList.setKeyName(storages.value[i].key)
-        router.push('/tasks')
-        break
+
+      for(let b = 0; b < storages.value[i].value.length; b++) {
+        // console.log(storages.value[i].value[b])
+        if(Object.keys(storages.value[i].value[b]).includes('email')){
+          console.log('opa, existe elemento com chave chamada email', storages.value[i].value[b])
+
+          if(user.value?.email === storages.value[i].value[b].email && user.value?.password === storages.value[i].value[b].password && storages.value[i].key !== 'lastSession'){
+            emailFound = true;
+            toast.success('Bem vindo (a) ao Power To Do.')
+            storeToDoList.setKeyName(storages.value[i].key)
+            dataStorage.setStorage('lastSession', [storages.value[i].value[b]])
+            router.push('/tasks')
+            break
+          }
+
+        }
       }
+
     }
     if(!emailFound) {
       toast.error('Nome de usuário ou senha incorretos.')

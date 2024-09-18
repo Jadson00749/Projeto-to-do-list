@@ -55,7 +55,6 @@ const enableAddition = ref('')
 const key = () => storeToDoList.getKeyName
 const listValues = ref([])
 const id = ref(0)
-const listTask = (val) => storeToDoList.setmyDaysCreated(val)
 const displayInput = () => storeToDoList.getInputDisplay
 const objLocalStorage = ref(null)
 const taskCompleted = ref(null)
@@ -65,7 +64,7 @@ const inputValueTask = (event) => {
 }
 
 const createTask = () => {
-  objLocalStorage.value = dataStorage.getStorage(key())
+  objLocalStorage.value = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)
   let obj = {
     id: id.value += 1,
     nameTask: enableAddition.value,
@@ -107,7 +106,7 @@ const rules = computed(()=>{
 })
 
 onBeforeMount(()=>{
-  objLocalStorage.value = dataStorage.getStorage(key())
+  objLocalStorage.value = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)
   taskCompleted.value = dataStorage.getStorage('taskCompleted')
   if(objLocalStorage.value){
     id.value = objLocalStorage.value[0]?.id
