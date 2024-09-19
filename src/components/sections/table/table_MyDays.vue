@@ -83,9 +83,9 @@ const createTask = () => {
       listValues.value = objLocalStorage.value
       listValues.value.push(obj)
       listValues.value.sort((a,b) => b?.id - a?.id)
-      dataStorage.setStorage(key(), listValues.value)
+      dataStorage.setStorage(key() || dataStorage.getStorage('lastSession')[0]?.id, listValues.value)
     }else {
-      dataStorage.setStorage(key(), [obj])
+      dataStorage.setStorage(key() || dataStorage.getStorage('lastSession')[0]?.id, [obj])
     }
     enableAddition.value = ''
     emit('getList')

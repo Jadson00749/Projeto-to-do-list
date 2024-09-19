@@ -7,7 +7,7 @@
         <div class=" h-[calc(100%-31%)] px-6 pt-1 overflow-auto z-auto" :class="isOpenModalLarge ? 'w-[calc(100%-30%)]' : 'w-full'" >
           <transition name="slide">
               <div v-if="listTask !== null && !loading()" class="mb-6">
-                  <div v-for="(ent,index) in listTask.slice(1)" :key="index">
+                  <div v-for="(ent,index) in listTask.filter(item => !item?.email)" :key="index">
                     <div class="w-full h-full pt-2 flex flex-col" >
                       <button @contextmenu.prevent="openModalOptions($event,index,ent,'notCompleted')" @click="selectedItem(ent,index)" :class="buttons === index ? 'bg-[#333333]' : ''" class="w-full min-h-[52px] text-white rounded-[4px] bg-[#222222] pl-5 flex justify-start items-center hover:bg-[#333333] transition-all duration-300 py-2">
                           <div @mouseover="checkButtons = index" @mouseout="checkButtons = !index" class="w-7 h-7 flex justify-center items-center">
@@ -363,9 +363,9 @@ tippy('#myButton', {
   content: "I'm a Tippy tooltip!",
 });
 
-// onMounted(()=>{
-//    console.log(listTask.value)
-// })
+onMounted(()=>{
+   console.log(listTask.value)
+})
 
 </script>
 

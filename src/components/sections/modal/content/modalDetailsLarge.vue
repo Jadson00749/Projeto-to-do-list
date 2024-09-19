@@ -153,6 +153,7 @@ import {
   import 'dayjs/locale/pt-br';
   import {formatFileSize } from '@/commons/settingsData'
   import { dataStorage } from '@/commons/settingsData';
+  import { toDoListStore } from '@/stores/toDoList.js'
 
 const props = defineProps({
   isOpen:{
@@ -169,6 +170,7 @@ const props = defineProps({
 
 const emit = defineEmits(['closeDetails'])
 
+const storeToDoList = toDoListStore()
 dayjs.extend(relativeTime)
 dayjs.locale('pt-br');
 const cursorActive = ref(false)
@@ -177,9 +179,9 @@ const placeHolderActive = ref(false)
 const dayHoverActive = ref(false)
 const remindmeHoverActive = ref(0)
 const key = () => storeToDoList.getKeyName
-const taskModel = computed(()=> dataStorage.getStorage(key())[props.indexSelected])
-const savedDate = ref(dayjs(dataStorage.getStorage(key())[props.indexSelected].updateTime) || "")
-const files = ref(dataStorage.getStorage(key())[props.indexSelected].taskDetails.files || [])
+const taskModel = computed(()=> dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected])
+const savedDate = ref(dayjs(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].updateTime) || "")
+const files = ref(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].taskDetails.files || [])
 const caractersInput = ref('')
 const currentDate = ref(savedDate.value);
 const fileInput = ref(null)
@@ -225,11 +227,11 @@ const deleteOneArquive = (arquive,index) => {
 }
 
 const deleteTask = () => {
-  let storage = dataStorage.getStorage(key())
+  let storage = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)
 
   storage[props.indexSelected].taskDetails.files = storage[props.indexSelected].taskDetails.files.filter(item => item?.name !== arquiveDetails.value?.name)
   
-  dataStorage.setStorage(key(), storage)
+  dataStorage.setStorage(key() || dataStorage.getStorage('lastSession')[0]?.id, storage)
   openDelete.value = false
   updateForceDetails.value = !updateForceDetails.value
 }
@@ -260,12 +262,12 @@ const rules = computed(()=>{
 
 watch(()=>props.objectSelected,()=>{
   console.log('entrei vou atualizar variavel')
-  savedDate.value = dayjs(dataStorage.getStorage(key())[props.indexSelected].updateTime)
-  taskModel.value = dataStorage.getStorage(key())[props.indexSelected]
+  savedDate.value = dayjs(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].updateTime)
+  taskModel.value = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected]
 })
 
 watch(()=>forceUpdate.value,async()=>{
-  files.value = dataStorage.getStorage(key())[props.indexSelected].taskDetails.files
+  files.value = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].taskDetails.files
   await nextTick()
   if(scrollMove.value){
     scrollMove.value.scrollTo({
@@ -276,20 +278,20 @@ watch(()=>forceUpdate.value,async()=>{
 })
 
 watch(()=>updateForceDetails.value,async()=>{
-  files.value = dataStorage.getStorage(key())[props.indexSelected].taskDetails.files
+  files.value = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].taskDetails.files
 })
 
 const dataInput = (event) => {
   console.log('entrei digitei input')
   caractersInput.value = event.target.value
 
-  let result = dataStorage.getStorage(key()) || []
+  let result = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id) || []
   result[props.indexSelected].updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss')  
   result[props.indexSelected].taskDetails.descr = caractersInput.value
-  dataStorage.setStorage(key(), result)
+  dataStorage.setStorage(key() || dataStorage.getStorage('lastSession')[0]?.id, result)
 
-  savedDate.value = dayjs(dataStorage.getStorage(key())[props.indexSelected].updateTime)
-  taskModel.value = dataStorage.getStorage(key())[props.indexSelected]
+  savedDate.value = dayjs(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].updateTime)
+  taskModel.value = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected]
 }
 
 const updatesPeriodically = () => {
@@ -322,7 +324,7 @@ const uploadFiles = (event) => {
 
 const saveUploads = (file) => {
 
-  const data = dataStorage.getStorage(key())
+  const data = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)
   let { name, size, type } = file
   
   const reader = new FileReader();
@@ -332,7 +334,7 @@ const saveUploads = (file) => {
     const newFile = {name:name,size:size,type:type,content:reader.result}
     
     data[props.indexSelected].taskDetails.files.push(newFile)
-    dataStorage.setStorage(key(), data)
+    dataStorage.setStorage(key() || dataStorage.getStorage('lastSession')[0]?.id, data)
     updateForceDetails.value = !updateForceDetails.value
   };
 }

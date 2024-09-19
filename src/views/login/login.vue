@@ -4,7 +4,7 @@
       <div class="--section relative">
         <div class="--title">
           <div class="rounded-full w-12 h-12 bg-[#333333]"></div>
-          <p>Bento Social</p>
+          <p>Power To Do</p>
         </div>
         <div class="--content">
           <div class="relative">
@@ -64,12 +64,8 @@ function login() {
     let emailFound = false;
 
     for(let i = 0; i < storages.value.length; i++) {
-
       for(let b = 0; b < storages.value[i].value.length; b++) {
-        // console.log(storages.value[i].value[b])
         if(Object.keys(storages.value[i].value[b]).includes('email')){
-          console.log('opa, existe elemento com chave chamada email', storages.value[i].value[b])
-
           if(user.value?.email === storages.value[i].value[b].email && user.value?.password === storages.value[i].value[b].password && storages.value[i].key !== 'lastSession'){
             emailFound = true;
             toast.success('Bem vindo (a) ao Power To Do.')
@@ -78,10 +74,8 @@ function login() {
             router.push('/tasks')
             break
           }
-
         }
       }
-
     }
     if(!emailFound) {
       toast.error('Nome de usuário ou senha incorretos.')
