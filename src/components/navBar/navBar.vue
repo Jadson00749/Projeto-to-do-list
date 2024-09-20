@@ -38,10 +38,12 @@
       <div class="absolute inset-x-0 bottom-0 h-[0.1px] bg-white opacity-30">
       </div>
     </div>
+    <modalLogOff :isOpen="true" />
   </nav>
 </template>
 
 <script setup>
+import modalLogOff from '../modal/modalLogOff.vue';
 import { Bars3Icon, MagnifyingGlassIcon, XMarkIcon, Cog6ToothIcon, QuestionMarkCircleIcon, NewspaperIcon, UserCircleIcon } from '@heroicons/vue/24/solid'
 import { ref } from 'vue';
 import { toDoListStore } from '@/stores/toDoList.js'

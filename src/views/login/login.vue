@@ -3,7 +3,10 @@
     <div class="login-card-container">
       <div class="--section relative">
         <div class="--title">
-          <div class="rounded-full w-12 h-12 bg-[#333333]"></div>
+          <!-- <div class="rounded-full w-12 h-12 bg-[#333333]"></div> -->
+          <svg class="w-[55px] h-[55px] drop-shadow-md bg-[#343434] rounded-full p-3 border border-white border-opacity-10" xmlns="http://www.w3.org/2000/svg" width="299.641" height="305.19" viewBox="0 0 299.641 305.19">
+          <path id="start-icon" d="M149.82,0s30.056,130.861,149.82,153.982c-.925.463-131.324,45.316-149.82,151.208ZM0,153.982C119.764,130.861,149.82,0,149.82,0V305.19C131.324,199.3.925,154.445,0,153.982Z" fill="#fff"/>
+        </svg>
           <p>Power To Do</p>
         </div>
         <div class="--content">
