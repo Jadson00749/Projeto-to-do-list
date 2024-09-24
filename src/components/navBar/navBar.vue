@@ -31,14 +31,14 @@
         <button v-tippy="{ content: 'Configurações', placement: 'bottom', delay: [300, 0], theme: 'light' }" class="navbar-section-icons-container-btn"><Cog6ToothIcon class="w-5 h-5" /></button>
         <button v-tippy="{ content: 'Ajuda e comentários', placement: 'bottom', delay: [300, 0], theme: 'light' }" class="navbar-section-icons-container-btn"><QuestionMarkCircleIcon class="w-5 h-5" /></button>
         <button v-tippy="{ content: 'Novidades', placement: 'bottom', delay: [300, 0], theme: 'light' }" class="navbar-section-icons-container-btn"><NewspaperIcon class="w-5 h-5" /></button>
-        <button v-tippy="{ content: 'Gerente de contas de Jadson Santos', placement: 'bottom', delay: [300, 0], theme: 'light' }" class="navbar-section-icons-container-btn"><UserCircleIcon class="w-5 h-5" /></button>
+        <button @click="openModalLogOff = !openModalLogOff" v-tippy="{ content: 'Gerente de contas de Jadson Santos', placement: 'bottom', delay: [300, 0], theme: 'light' }" class="navbar-section-icons-container-btn"><UserCircleIcon class="w-5 h-5" /></button>
       </div>
     </div>
     <div class="relative">
       <div class="absolute inset-x-0 bottom-0 h-[0.1px] bg-white opacity-30">
       </div>
     </div>
-    <modalLogOff :isOpen="true" />
+    <modalLogOff v-if="openModalLogOff" :isOpen="openModalLogOff" @close="openModalLogOff = false" />
   </nav>
 </template>
 
@@ -52,6 +52,7 @@ const storeToDoList = toDoListStore()
 const inputClicked = ref(false);
 const displayPlaceHolder = ref('')
 const eventInput = ref('')
+const openModalLogOff = ref(false)
 
 const inputCaracters = (event) => {
   eventInput.value = event.target.value
@@ -98,6 +99,10 @@ const visiblePlaceHolder = () => {
  
 .navbar-section-icons-container-btn {
   @apply w-[25%] flex justify-center items-center;
+}
+
+.navbar-section-icons-container-btn:hover {
+  @apply bg-[#222222] transition-all duration-100;
 }
 
 .place-holder-adjustment::placeholder {

@@ -2,7 +2,7 @@
   <div class="modal-content-container" :class="storeToDoList.getdisplayMenuLeft ? '!w-full ml-auto' : ''">
     <Loaderv2 v-if="displayLoader" :open="displayLoader" />
     <sectionsSelectedDefault v-if="displayDefault()" />
-    <myDays v-if="displayMyDays()" :displayIconSun="displayIconSun" />
+    <myDays v-if="displayMyDays() && !displayDefault()" :displayIconSun="displayIconSun" />
     <Important v-if="displayImportant()" />
     <Planned v-if="displayPlanned()" />
     <AssignedToMe v-if="displayAssignedToMe()" />
