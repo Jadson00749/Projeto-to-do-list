@@ -21,15 +21,15 @@ export const dataStorage = {
     let maxId = 0
     const items = [];
 
-    for(let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      const value = localStorage.getItem(key)
+    for(let i = 0; i < this.getStorage('allAccounts').length; i++) {
+      const key = String(this.getStorage('allAccounts')[i].id)
+      const value = this.getStorage('allAccounts')[i]
       const numericKey = Number(key)
 
       if(!isNaN(numericKey) && numericKey > maxId) {
         maxId = numericKey
       }    
-      items.push({ key, value: JSON.parse(value) })     
+      items.push({ key, value: value })     
     }
     return {
       storages: items,

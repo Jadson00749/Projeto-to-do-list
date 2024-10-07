@@ -108,13 +108,14 @@ const rules = computed(()=>{
 onBeforeMount(()=>{
   objLocalStorage.value = dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)
   taskCompleted.value = dataStorage.getStorage('taskCompleted')
-  if(objLocalStorage.value){
+  if(objLocalStorage.value.length || taskCompleted.value.length){
     id.value = objLocalStorage.value[0]?.id
-  }else if(taskCompleted.value) {
-    id.value = taskCompleted.value.reduce((max, obj) => (obj.id > max.id ? obj : max), taskCompleted.value[0]).id
+    let result = taskCompleted.value.reduce((max, obj) => (obj.id > max.id ? obj : max), taskCompleted.value[0]).id
+    if(id.value < result) id.value = result
   }else{
     id.value = 0
   }
+  console.log(id.value)
 })
 
 </script>

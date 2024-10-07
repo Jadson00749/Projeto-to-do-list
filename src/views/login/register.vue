@@ -81,6 +81,7 @@ const userEmail = ref(null)
 const userConfirmPassword = ref('')
 const displaySection = ref(true)
 const maxId = ref(0)
+const allAccounts = ref(dataStorage.getStorage('allAccounts'))
 const userInformation = ref({
   id: maxId.value,
   email: '',
@@ -96,9 +97,13 @@ function validateLoginAndCreateAccount() {
       if(validatedRules()) {
         userInformation.value.id = maxId.value += 1
         userInformation.value.creationDate = dayjs().format('DD/MM/YYYY HH:mm:ss')
-        
-        dataStorage.setStorage(userInformation.value.id, [userInformation.value])
-        
+
+        allAccounts.value.push(userInformation.value)
+        dataStorage.setStorage(userInformation.value.id, [])
+
+        dataStorage.setStorage('lastSession', [userInformation.value])
+        dataStorage.setStorage('allAccounts', allAccounts.value)
+
         toast.success('Cadastro realizado com sucesso!')
         router.push('/')
 

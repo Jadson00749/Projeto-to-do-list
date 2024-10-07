@@ -65,19 +65,15 @@ function login() {
   } {
     validActive.value = false
     let emailFound = false;
-
     for(let i = 0; i < storages.value.length; i++) {
-      for(let b = 0; b < storages.value[i].value.length; b++) {
-        if(Object.keys(storages.value[i].value[b]).includes('email')){
-          if(user.value?.email === storages.value[i].value[b].email && user.value?.password === storages.value[i].value[b].password && storages.value[i].key !== 'lastSession'){
+        console.log('entrei no if B')
+          if(user.value?.email === storages.value[i].value?.email && user.value?.password === storages.value[i].value?.password){
             emailFound = true;
             toast.success('Bem vindo (a) ao Power To Do.')
             storeToDoList.setKeyName(storages.value[i].key)
-            dataStorage.setStorage('lastSession', [storages.value[i].value[b]])
+            dataStorage.setStorage('lastSession', [storages.value[i].value])
             router.push('/tasks')
             break
-          }
-        }
       }
     }
     if(!emailFound) {

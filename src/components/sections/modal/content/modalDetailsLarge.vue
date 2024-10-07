@@ -106,10 +106,10 @@
             </div>
           </div>
 
-          <div class="text-area-button" :class="taskModel.taskDetails.descr === '' ? 'h-[76px]' : 'h-[92px]'">
+          <div class="text-area-button" :class="taskModel.taskDetails?.descr === '' ? 'h-[76px]' : 'h-[92px]'">
             <div>
               <input placeholder="Adicionar anotação" @input="dataInput" v-model="taskModel.taskDetails.descr" />
-                <div v-if="taskModel.taskDetails.descr !== ''">
+                <div v-if="taskModel?.taskDetails?.descr !== ''">
                   <p>{{ diffDay >= 30 ? 'Atualizado em' : 'Atualizado' }} {{ previosTime }}</p>
                 </div>
             </div>
@@ -147,7 +147,7 @@ import {
     } from '@headlessui/vue'
   import modalCenter from '@/components/sections/modal/default/modalCenter.vue'
   import modalConfirmDelete from '@/components/modal/modalConfirmDelete.vue'
-  import {ref,computed, onMounted, watch, provide, inject, nextTick } from 'vue'
+  import {ref,computed, onMounted, watch, provide, inject, nextTick, onBeforeMount } from 'vue'
   import dayjs from 'dayjs';
   import relativeTime from 'dayjs/plugin/relativeTime';
   import 'dayjs/locale/pt-br';
@@ -180,8 +180,8 @@ const dayHoverActive = ref(false)
 const remindmeHoverActive = ref(0)
 const key = () => storeToDoList.getKeyName
 const taskModel = computed(()=> dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected])
-const savedDate = ref(dayjs(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].updateTime) || "")
-const files = ref(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].taskDetails.files || [])
+const savedDate = ref(dayjs(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected]?.updateTime) || "")
+const files = ref(dataStorage.getStorage(key() || dataStorage.getStorage('lastSession')[0]?.id)[props.indexSelected].taskDetails?.files || [])
 const caractersInput = ref('')
 const currentDate = ref(savedDate.value);
 const fileInput = ref(null)
@@ -339,7 +339,7 @@ const saveUploads = (file) => {
   };
 }
 
-onMounted(()=>{
+onBeforeMount(()=>{
   updatesPeriodically();
 })
 
